@@ -1,11 +1,17 @@
 import { Pool } from "pg";
 
+const connectionString =
+  process.env.DATABASE_URL ||
+  "postgresql://bbuser:bbpass@localhost:5432/badminton_buddy";
+
+// Neon and most managed Postgres providers require SSL
+const isExternal = process.env.DATABASE_URL && !process.env.DATABASE_URL.includes("localhost");
+
 const pool = new Pool({
-  connectionString:
-    process.env.DATABASE_URL ||
-    "postgresql://bbuser:bbpass@localhost:5432/badminton_buddy",
+  connectionString,
   max: 10,
   connectionTimeoutMillis: 5000,
+  ssl: isExternal ? { rejectUnauthorized: false } : false,
 });
 
 export default pool;

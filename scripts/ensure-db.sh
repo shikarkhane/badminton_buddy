@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
-# Ensure PostgreSQL is running and the database exists
+# Ensure PostgreSQL is running and the database exists (local dev only).
+# Skipped in production/CI where DATABASE_URL points to an external service.
+
+if [ -n "$DATABASE_URL" ]; then
+  echo "DATABASE_URL is set — using external database, skipping local setup."
+  exit 0
+fi
+
+if ! command -v pg_isready &>/dev/null; then
+  echo "PostgreSQL not installed locally — skipping local setup."
+  exit 0
+fi
+
 set -e
 
 if ! pg_isready -q 2>/dev/null; then
