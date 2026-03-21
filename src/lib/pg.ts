@@ -1,11 +1,32 @@
 import { Pool } from "pg";
 
-const connectionString =
-  process.env.DATABASE_URL ||
-  "postgresql://bbuser:bbpass@localhost:5432/badminton_buddy";
+// Neon + Vercel integration may use a prefixed name like SHUTTLE_LAB_DATABASE_URL
+// or POSTGRES_URL. Fall back to individual PG* vars, then local dev default.
+function resolveConnectionString(): string {
+  // Check for full connection string under common names
+  for (const key of Object.keys(process.env)) {
+    if (key === "DATABASE_URL" || key === "POSTGRES_URL" || key.endsWith("_DATABASE_URL")) {
+      if (process.env[key]) return process.env[key]!;
+    }
+  }
+
+  // Build from individual Neon/Vercel PG* vars (possibly prefixed)
+  const pgKeys = Object.keys(process.env);
+  const host = pgKeys.find((k) => k.endsWith("PGHOST"));
+  const db = pgKeys.find((k) => k.endsWith("PGDATABASE"));
+  const user = pgKeys.find((k) => k.endsWith("PGUSER"));
+  const pass = pgKeys.find((k) => k.endsWith("PGPASSWORD"));
+  if (host && db && user && pass) {
+    return `postgresql://${process.env[user]}:${process.env[pass]}@${process.env[host]}/${process.env[db]}?sslmode=require`;
+  }
+
+  return "postgresql://bbuser:bbpass@localhost:5432/badminton_buddy";
+}
+
+const connectionString = resolveConnectionString();
 
 // Neon and most managed Postgres providers require SSL
-const isExternal = process.env.DATABASE_URL && !process.env.DATABASE_URL.includes("localhost");
+const isExternal = !connectionString.includes("localhost");
 
 const pool = new Pool({
   connectionString,
