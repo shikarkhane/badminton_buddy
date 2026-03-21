@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useAuth } from "./AuthProvider";
+import ShuttleLabLogo from "./ShuttleLabLogo";
 import { useState } from "react";
 
 export default function Navbar() {
@@ -17,7 +18,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between h-16 items-center">
           <Link href="/" className="text-xl font-bold flex items-center gap-2">
-            <span className="text-2xl">&#127992;</span>
+            <ShuttleLabLogo className="h-7 w-7 text-white" />
             {t("common.appName")}
           </Link>
 

@@ -6,7 +6,7 @@ import Navbar from "@/components/Navbar";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Badminton Buddy - AI Training Programs",
+  title: "Shuttle Lab - AI Badminton Training Programs",
   description:
     "Create personalized badminton training programs with AI. Track your progress and improve your game.",
 };

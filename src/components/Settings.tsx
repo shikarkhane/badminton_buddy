@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import Link from "next/link";
 import { useAuth } from "./AuthProvider";
 import { updateSettings } from "@/lib/api";
 
@@ -46,6 +47,12 @@ export default function Settings() {
           <p className="text-sm text-gray-400 mt-1">
             {t("settings.apiKeyHelp")}
           </p>
+          <Link
+            href="/guide"
+            className="inline-block text-sm text-emerald-600 hover:text-emerald-800 mt-2 underline"
+          >
+            {t("settings.apiKeyGuideLink")}
+          </Link>
         </div>
 
         <div>

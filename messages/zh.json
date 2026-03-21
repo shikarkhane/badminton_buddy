@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "羽毛球伙伴",
+    "appName": "Shuttle Lab",
     "tagline": "您的AI驱动羽毛球训练伙伴",
     "login": "使用Google登录",
     "guestLogin": "以访客身份继续",
@@ -39,7 +39,10 @@
     "feature5Title": "多种技能领域",
     "feature5Desc": "从步法到杀球技术，网前球到双打策略——涵盖羽毛球的方方面面。",
     "feature6Title": "渐进式级别",
-    "feature6Desc": "每个课程可选择3到10个渐进级别。"
+    "feature6Desc": "每个课程可选择3到10个渐进级别。",
+    "ctaTitle": "准备好提升你的水平了吗？",
+    "ctaDesc": "从AI生成的课程开始，或创建你自己的自定义训练计划。",
+    "ctaButton": "创建你的第一个课程"
   },
   "programs": {
     "title": "我的训练课程",
@@ -96,8 +99,39 @@
     "apiKeyLabel": "OpenAI API密钥",
     "apiKeyPlaceholder": "sk-...",
     "apiKeyHelp": "您的API密钥存储在会话中，用于生成训练课程。",
+    "apiKeyGuideLink": "如何获取API密钥？",
     "languageLabel": "语言",
     "saved": "设置已保存！"
+  },
+  "guide": {
+    "title": "如何设置您的OpenAI API密钥",
+    "subtitle": "简单的分步指南，让您的AI训练课程正常工作。",
+    "whatTitle": "什么是OpenAI API密钥？",
+    "whatDesc": "API密钥就像一个密码，让Shuttle Lab可以代表您与OpenAI的AI通信。当您让Shuttle Lab创建训练课程时，它会将您的请求发送给OpenAI来生成课程。API密钥告诉OpenAI这个请求来自您的账户。",
+    "whyTitle": "为什么需要它？",
+    "whyDesc": "Shuttle Lab使用OpenAI的AI来创建个性化的羽毛球训练课程。您的API密钥用于：",
+    "whyPoint1": "根据您选择的主题和强度生成训练课程",
+    "whyPoint2": "获取下一个训练重点的智能建议",
+    "whyPoint3": "创建具有正确渐进级别数的课程",
+    "costTitle": "Shuttle Lab免费吗？",
+    "costDesc": "是的！Shuttle Lab本身完全免费使用。唯一的费用是OpenAI对使用其AI收取的费用。每次生成训练课程大约花费0.01到0.05美元（几美分）。您可以在OpenAI账户上设置消费限额。",
+    "costNote": "您也可以不用API密钥使用Shuttle Lab——只需使用我们内置的模板创建自定义课程，完全免费。",
+    "stepsTitle": "如何获取API密钥（5个简单步骤）",
+    "step1Title": "创建OpenAI账户",
+    "step1Desc": "访问platform.openai.com并注册免费账户。您可以使用Google或Microsoft账户快速注册。",
+    "step2Title": "添加付款方式",
+    "step2Desc": "在OpenAI账户中进入设置 > 账单。添加信用卡或借记卡。您可以设置每月消费限额（最低5美元）。",
+    "step3Title": "创建API密钥",
+    "step3Desc": "在OpenAI账户中进入设置 > API密钥。点击\"创建新的密钥\"，给它起个名字如\"Shuttle Lab\"，然后点击创建。密钥以\"sk-\"开头。",
+    "step4Title": "复制密钥",
+    "step4Desc": "立即复制——OpenAI只会显示一次。如果丢失了，您随时可以创建新的。",
+    "step5Title": "粘贴到Shuttle Lab",
+    "step5Desc": "在Shuttle Lab的设置中粘贴您的密钥。点击保存，就完成了！",
+    "safetyTitle": "安全吗？",
+    "safetyPoint1": "您的密钥仅存储在浏览器会话中——我们不会将其保存到任何数据库或与任何人共享。",
+    "safetyPoint2": "您可以随时从OpenAI账户中删除或更改密钥。",
+    "safetyPoint3": "在OpenAI账户上设置消费限额以控制成本。",
+    "goToSettings": "前往设置添加密钥"
   },
   "intensity": {
     "low": "低",

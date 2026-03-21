@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Badminton Buddy",
+    "appName": "Shuttle Lab",
     "tagline": "Tu Compañero de Entrenamiento de Bádminton con IA",
     "login": "Iniciar sesión con Google",
     "guestLogin": "Continuar como Invitado",
@@ -39,7 +39,10 @@
     "feature5Title": "Múltiples Áreas",
     "feature5Desc": "Desde juego de pies hasta técnica de remate, juego en red hasta estrategia de dobles.",
     "feature6Title": "Niveles Progresivos",
-    "feature6Desc": "Elige de 3 a 10 niveles de progresión por programa."
+    "feature6Desc": "Elige de 3 a 10 niveles de progresión por programa.",
+    "ctaTitle": "¿Listo para mejorar tu juego?",
+    "ctaDesc": "Comienza con un programa generado por IA o crea tu propio plan personalizado.",
+    "ctaButton": "Crea Tu Primer Programa"
   },
   "programs": {
     "title": "Mis Programas de Entrenamiento",
@@ -96,8 +99,39 @@
     "apiKeyLabel": "Clave API de OpenAI",
     "apiKeyPlaceholder": "sk-...",
     "apiKeyHelp": "Tu clave API se almacena en tu sesión y se usa para generar programas.",
+    "apiKeyGuideLink": "¿Cómo obtengo una clave API?",
     "languageLabel": "Idioma",
     "saved": "¡Configuración guardada!"
+  },
+  "guide": {
+    "title": "Cómo Configurar Tu Clave API de OpenAI",
+    "subtitle": "Una guía sencilla paso a paso para que tus programas de entrenamiento con IA funcionen.",
+    "whatTitle": "¿Qué es una clave API de OpenAI?",
+    "whatDesc": "Una clave API es como una contraseña que permite a Shuttle Lab comunicarse con la IA de OpenAI en tu nombre. Cuando le pides a Shuttle Lab que cree un programa de entrenamiento, envía tu solicitud a OpenAI, que genera el programa. La clave API le dice a OpenAI que la solicitud viene de tu cuenta.",
+    "whyTitle": "¿Por qué la necesitas?",
+    "whyDesc": "Shuttle Lab usa la IA de OpenAI para crear programas de entrenamiento de bádminton personalizados. Tu clave API es necesaria para:",
+    "whyPoint1": "Generar programas de entrenamiento basados en tu tema e intensidad elegidos",
+    "whyPoint2": "Obtener sugerencias inteligentes para tu próximo enfoque de entrenamiento",
+    "whyPoint3": "Crear programas con el número correcto de niveles de progresión",
+    "costTitle": "¿Es gratis Shuttle Lab?",
+    "costDesc": "¡Sí! Shuttle Lab en sí es completamente gratis. El único costo es lo que OpenAI cobra por usar su IA. Cada generación de programa cuesta aproximadamente $0.01 a $0.05 (unos centavos). Puedes establecer un límite de gasto en tu cuenta de OpenAI.",
+    "costNote": "También puedes usar Shuttle Lab sin clave API — solo crea programas personalizados usando nuestras plantillas integradas sin ningún costo.",
+    "stepsTitle": "Cómo obtener tu clave API (5 pasos fáciles)",
+    "step1Title": "Crea una cuenta en OpenAI",
+    "step1Desc": "Ve a platform.openai.com y regístrate. Puedes usar tu cuenta de Google o Microsoft.",
+    "step2Title": "Agrega un método de pago",
+    "step2Desc": "Ve a Configuración > Facturación en tu cuenta de OpenAI. Agrega una tarjeta. Puedes establecer un límite mensual (incluso tan bajo como $5).",
+    "step3Title": "Crea una clave API",
+    "step3Desc": "Ve a Configuración > Claves API. Haz clic en \"Crear nueva clave secreta\", dale un nombre como \"Shuttle Lab\" y haz clic en Crear. Tu clave comenzará con \"sk-\".",
+    "step4Title": "Copia tu clave",
+    "step4Desc": "Cópiala de inmediato — OpenAI solo la mostrará una vez. Si la pierdes, siempre puedes crear una nueva.",
+    "step5Title": "Pégala en Shuttle Lab",
+    "step5Desc": "Ve a Configuración en Shuttle Lab y pega tu clave. Haz clic en Guardar, ¡y listo!",
+    "safetyTitle": "¿Es seguro?",
+    "safetyPoint1": "Tu clave se almacena solo en la sesión de tu navegador — nunca la guardamos en ninguna base de datos.",
+    "safetyPoint2": "Puedes eliminar o cambiar tu clave en cualquier momento desde tu cuenta de OpenAI.",
+    "safetyPoint3": "Establece un límite de gasto en tu cuenta de OpenAI para controlar los costos.",
+    "goToSettings": "Ir a Configuración para Agregar Tu Clave"
   },
   "intensity": {
     "low": "Baja",

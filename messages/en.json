@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Badminton Buddy",
+    "appName": "Shuttle Lab",
     "tagline": "Your AI-Powered Badminton Training Partner",
     "login": "Sign in with Google",
     "guestLogin": "Continue as Guest",
@@ -39,7 +39,10 @@
     "feature5Title": "Multiple Skill Areas",
     "feature5Desc": "From footwork to smash technique, net play to doubles strategy — cover all aspects of badminton.",
     "feature6Title": "Progressive Levels",
-    "feature6Desc": "Choose 3 to 10 progression levels per program to match your improvement pace."
+    "feature6Desc": "Choose 3 to 10 progression levels per program to match your improvement pace.",
+    "ctaTitle": "Ready to improve your game?",
+    "ctaDesc": "Start with an AI-generated program or create your own custom training plan.",
+    "ctaButton": "Create Your First Program"
   },
   "programs": {
     "title": "My Training Programs",
@@ -96,8 +99,39 @@
     "apiKeyLabel": "OpenAI API Key",
     "apiKeyPlaceholder": "sk-...",
     "apiKeyHelp": "Your API key is stored in your session and used to generate training programs.",
+    "apiKeyGuideLink": "How do I get an API key?",
     "languageLabel": "Language",
     "saved": "Settings saved!"
+  },
+  "guide": {
+    "title": "How to Set Up Your OpenAI API Key",
+    "subtitle": "A simple step-by-step guide to get your AI-powered training programs working.",
+    "whatTitle": "What is an OpenAI API key?",
+    "whatDesc": "An API key is like a password that lets Shuttle Lab talk to OpenAI's AI on your behalf. When you ask Shuttle Lab to create a training program, it sends your request to OpenAI, which generates the program. The API key tells OpenAI that the request is coming from your account.",
+    "whyTitle": "Why do you need it?",
+    "whyDesc": "Shuttle Lab uses OpenAI's AI to create personalized badminton training programs. Your API key is needed to:",
+    "whyPoint1": "Generate training programs based on your chosen theme and intensity",
+    "whyPoint2": "Get smart suggestions for your next training focus",
+    "whyPoint3": "Create programs with the right number of progression levels",
+    "costTitle": "Is Shuttle Lab free?",
+    "costDesc": "Yes! Shuttle Lab itself is completely free to use. The only cost is what OpenAI charges for using their AI. Each training program generation costs roughly $0.01 to $0.05 (a few cents). You can set a spending limit on your OpenAI account so you never spend more than you want.",
+    "costNote": "You can also use Shuttle Lab without an API key — just create custom programs using our built-in templates at no cost at all.",
+    "stepsTitle": "How to get your API key (5 easy steps)",
+    "step1Title": "Create an OpenAI account",
+    "step1Desc": "Go to platform.openai.com and sign up for a free account. You can use your Google or Microsoft account to sign up quickly.",
+    "step2Title": "Add payment method",
+    "step2Desc": "Go to Settings > Billing in your OpenAI account. Add a credit or debit card. You can set a monthly spending limit (even as low as $5) so there are no surprises.",
+    "step3Title": "Create an API key",
+    "step3Desc": "Go to Settings > API Keys in your OpenAI account. Click \"Create new secret key\", give it a name like \"Shuttle Lab\", and click Create. Your key will start with \"sk-\".",
+    "step4Title": "Copy your key",
+    "step4Desc": "Copy the key right away — OpenAI will only show it once. If you lose it, you can always create a new one.",
+    "step5Title": "Paste it in Shuttle Lab",
+    "step5Desc": "Go to Settings in Shuttle Lab and paste your key in the OpenAI API Key field. Click Save, and you're all set!",
+    "safetyTitle": "Is it safe?",
+    "safetyPoint1": "Your key is stored only in your browser session — we never save it to any database or share it with anyone.",
+    "safetyPoint2": "You can delete or change your key anytime from your OpenAI account.",
+    "safetyPoint3": "Set a spending limit on your OpenAI account to stay in control of costs.",
+    "goToSettings": "Go to Settings to Add Your Key"
   },
   "intensity": {
     "low": "Low",

@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import ShuttleLabLogo from "./ShuttleLabLogo";
 
 const features = [
   { key: "feature1", icon: "&#129302;" },
@@ -20,6 +21,9 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="bg-gradient-to-br from-emerald-600 to-teal-700 text-white py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
+          <div className="flex justify-center mb-6">
+            <ShuttleLabLogo className="h-20 w-20 text-white opacity-90" />
+          </div>
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
             {t("heroTitle")}
           </h1>
@@ -70,17 +74,16 @@ export default function LandingPage() {
       <section className="bg-emerald-800 text-white py-16 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">
-            Ready to improve your game?
+            {t("ctaTitle")}
           </h2>
           <p className="text-emerald-200 mb-8">
-            Start with an AI-generated program or create your own custom
-            training plan.
+            {t("ctaDesc")}
           </p>
           <Link
             href="/create"
             className="inline-block bg-white text-emerald-800 font-semibold px-8 py-3 rounded-lg hover:bg-emerald-50 transition text-lg"
           >
-            Create Your First Program
+            {t("ctaButton")}
           </Link>
         </div>
       </section>

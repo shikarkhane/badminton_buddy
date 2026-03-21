@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useAuth } from "./AuthProvider";
+import ShuttleLabLogo from "./ShuttleLabLogo";
 import { useState } from "react";
 
 export default function LoginScreen() {
@@ -22,7 +23,9 @@ export default function LoginScreen() {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
         <div className="text-center mb-8">
-          <div className="text-6xl mb-4">&#127992;</div>
+          <div className="flex justify-center mb-4">
+            <ShuttleLabLogo className="h-16 w-16 text-emerald-700" />
+          </div>
           <h1 className="text-3xl font-bold text-emerald-800">
             {t("common.appName")}
           </h1>
