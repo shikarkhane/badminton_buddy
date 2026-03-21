@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 import {
   generateProgram,
+  parseCustomProgram,
   createProgram as saveProgram,
 } from "@/lib/api";
 import { TrainingLevel, TrainingExercise } from "@/lib/types";
@@ -29,7 +30,7 @@ export default function CreateProgram() {
   const t = useTranslations();
   const router = useRouter();
   const { user } = useAuth();
-  const [tab, setTab] = useState<"ai" | "custom">("ai");
+  const [tab, setTab] = useState<"ai" | "text" | "custom">("ai");
 
   // AI form state
   const [theme, setTheme] = useState("");
@@ -37,6 +38,10 @@ export default function CreateProgram() {
   const [levelCount, setLevelCount] = useState(3);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState("");
+
+  // Text form state
+  const [freeText, setFreeText] = useState("");
+  const [converting, setConverting] = useState(false);
 
   // Custom form state
   const [customTitle, setCustomTitle] = useState("");
@@ -91,6 +96,31 @@ export default function CreateProgram() {
       router.push("/programs");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Save failed");
+    }
+  };
+
+  const handleConvertText = async () => {
+    if (!user?.openaiApiKey) {
+      setError(t("create.noApiKey"));
+      return;
+    }
+    setConverting(true);
+    setError("");
+    try {
+      const { program: parsed } = await parseCustomProgram(freeText);
+      await saveProgram({
+        title: parsed.title,
+        theme: parsed.theme,
+        intensity: (parsed.intensity as "low" | "medium" | "high" | "extreme") || "medium",
+        levels: parsed.levels,
+        isCustom: true,
+        isAIGenerated: false,
+      });
+      router.push("/programs");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Conversion failed");
+    } finally {
+      setConverting(false);
     }
   };
 
@@ -162,6 +192,16 @@ export default function CreateProgram() {
           }`}
         >
           {t("create.aiTab")}
+        </button>
+        <button
+          onClick={() => setTab("text")}
+          className={`px-6 py-2 rounded-lg font-medium transition ${
+            tab === "text"
+              ? "bg-emerald-600 text-white"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+          }`}
+        >
+          {t("create.textTab")}
         </button>
         <button
           onClick={() => setTab("custom")}
@@ -237,6 +277,37 @@ export default function CreateProgram() {
               className="w-full bg-emerald-600 text-white py-3 rounded-lg font-medium hover:bg-emerald-700 transition disabled:opacity-50"
             >
               {generating ? t("create.generating") : t("create.generateBtn")}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Text Tab */}
+      {tab === "text" && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t("create.textLabel")}
+              </label>
+              <textarea
+                value={freeText}
+                onChange={(e) => setFreeText(e.target.value)}
+                placeholder={t("create.textPlaceholder")}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 min-h-[200px]"
+                rows={8}
+              />
+              <p className="text-sm text-gray-400 mt-1">
+                {t("create.textHelp")}
+              </p>
+            </div>
+
+            <button
+              onClick={handleConvertText}
+              disabled={converting || freeText.trim().length < 10}
+              className="w-full bg-emerald-600 text-white py-3 rounded-lg font-medium hover:bg-emerald-700 transition disabled:opacity-50"
+            >
+              {converting ? t("create.converting") : t("create.convertBtn")}
             </button>
           </div>
         </div>

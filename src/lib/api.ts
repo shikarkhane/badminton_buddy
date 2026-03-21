@@ -104,6 +104,20 @@ export async function generateProgram(data: {
   });
 }
 
+export async function parseCustomProgram(text: string): Promise<{
+  program: {
+    title: string;
+    theme: string;
+    intensity: string;
+    levels: TrainingProgram["levels"];
+  };
+}> {
+  return fetchJson("/api/programs/parse", {
+    method: "POST",
+    body: JSON.stringify({ text }),
+  });
+}
+
 // Training Log
 export async function getTrainingLog(): Promise<{ log: TrainingLogEntry[] }> {
   return fetchJson("/api/training-log");

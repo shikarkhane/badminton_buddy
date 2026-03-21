@@ -3,7 +3,6 @@ import OpenAI from "openai";
 import { getCurrentUser } from "@/lib/auth";
 
 function extractJson(text: string): string {
-  // Strip markdown code fences if present (```json ... ``` or ``` ... ```)
   const fenceMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/);
   if (fenceMatch) {
     return fenceMatch[1].trim();
@@ -28,49 +27,32 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+
+  const { text } = body;
+
+  if (!text || typeof text !== "string" || text.trim().length < 10) {
     return NextResponse.json(
-      { error: "Invalid request body" },
+      { error: "Please enter a description of your training program (at least a few sentences)." },
       { status: 400 }
     );
   }
 
-  const { theme, intensity, levelCount } = body;
+  const prompt = `Convert the following free-text description of a badminton training program into a structured JSON format.
 
-  if (!theme) {
-    return NextResponse.json(
-      { error: "Please enter a training theme" },
-      { status: 400 }
-    );
-  }
+User's description:
+"""
+${text}
+"""
 
-  const prompt = `Create a badminton training program with the following specifications:
-- Theme: ${theme}
-- Intensity: ${intensity}
-- Number of progression levels: ${levelCount}
-
-For each level, provide:
-1. A title (e.g., "Beginner Foundations")
-2. A brief description of the level's focus
-3. 3-5 exercises/drills, each with:
-   - name: A clear drill name
-   - description: IMPORTANT — write this as a practical drill setup and gameplay instruction:
-     * First, explain the SETUP: how many players, where they stand, what equipment is needed, court positioning
-     * Then, explain the DRILL FLOW: what each player does, the sequence of shots/movements, how points are scored or how the drill cycles
-     * Include variations or progressions within the drill where appropriate
-     * Do NOT just describe what the ideal position or technique "looks like" — instead describe what players actually DO step by step
-   - duration: Time (e.g., "15 minutes", "3 sets of 5 minutes")
-   - reps: Number of reps if applicable (optional)
-   - tips: 1-2 key coaching tips for common mistakes
-
-Example of a GOOD drill description:
-"Setup: Player A stands at the net (forehand side), Player B at the baseline (center). Place 3 shuttles on Player B's side. Drill: Player B feeds a high clear to Player A's backhand corner. Player A moves to the corner, plays a drop shot crosscourt, then recovers to center net. Player B picks up the drop and feeds another clear. Repeat 10 times, then switch roles. Progression: Add a third player who intercepts weak drops."
-
-Example of a BAD drill description (do NOT write like this):
-"The player should be in a low stance with knees bent and racket up, ready to intercept at the net."
+Interpret the user's intent and create a well-structured training program. If they mention specific drills, exercises, or levels, use those. If the description is vague, fill in reasonable details based on what a badminton coach would recommend.
 
 Return ONLY valid JSON in this exact format (no markdown, no code fences):
 {
   "title": "Program Title",
+  "theme": "Main training theme",
+  "intensity": "low" | "medium" | "high" | "extreme",
   "levels": [
     {
       "level": 1,
@@ -79,7 +61,7 @@ Return ONLY valid JSON in this exact format (no markdown, no code fences):
       "exercises": [
         {
           "name": "Exercise name",
-          "description": "Setup: ... Drill: ... Progression: ...",
+          "description": "Step-by-step setup: how to arrange players, equipment, and court positions. Then describe the gameplay/drill flow.",
           "duration": "15 minutes",
           "reps": "10 per side",
           "tips": "Key coaching tip"
@@ -104,11 +86,11 @@ Return ONLY valid JSON in this exact format (no markdown, no code fences):
         {
           role: "system",
           content:
-            "You are a professional badminton coach creating actionable training programs. Every drill must describe the concrete setup (players, positions, equipment) and the gameplay flow (who does what, shot sequences, scoring). Never describe static positions or ideal form — always describe what players actively do. Respond with valid JSON only, no markdown.",
+            "You are a professional badminton coach. Convert free-text training descriptions into structured training programs. Always respond with valid JSON only.",
         },
         { role: "user", content: prompt },
       ],
-      temperature: 0.7,
+      temperature: 0.5,
     });
 
     const content = completion.choices[0]?.message?.content;
@@ -145,20 +127,12 @@ Return ONLY valid JSON in this exact format (no markdown, no code fences):
           { status: 429 }
         );
       }
-      if (error.status === 402 || error.message?.includes("insufficient_quota")) {
-        return NextResponse.json(
-          { error: "Your OpenAI account has no credits. Please add billing at platform.openai.com." },
-          { status: 402 }
-        );
-      }
       return NextResponse.json(
         { error: `OpenAI error: ${error.message}` },
         { status: error.status || 500 }
       );
     }
-
-    const message =
-      error instanceof Error ? error.message : "Failed to generate program";
+    const message = error instanceof Error ? error.message : "Failed to parse program";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

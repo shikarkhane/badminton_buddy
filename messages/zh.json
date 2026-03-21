@@ -47,6 +47,7 @@
   "programs": {
     "title": "我的训练课程",
     "empty": "还没有课程。创建您的第一个训练课程吧！",
+    "guestWarning": "您正在以访客身份使用Shuttle Lab。如果不登录，您保存的课程将会丢失。请使用Google登录以保留您的数据。",
     "searchPlaceholder": "按标题、主题或强度搜索...",
     "aiGenerated": "AI生成",
     "custom": "自定义",
@@ -79,7 +80,13 @@
     "exerciseTips": "提示",
     "addExercise": "添加练习",
     "removeExercise": "删除",
-    "saveProgram": "保存课程"
+    "saveProgram": "保存课程",
+    "textTab": "从文本创建",
+    "textLabel": "描述您的训练课程",
+    "textPlaceholder": "用文字描述您的课程。例如：\n\n我想要一个3级的双打策略课程。从基本站位和轮转开始，然后是攻防阵型，最后是高级战术组合。每个练习15-20分钟，每边2名球员。",
+    "textHelp": "自由书写——AI会将您的描述转换为包含级别和练习的结构化课程。",
+    "convertBtn": "转换为课程",
+    "converting": "正在转换您的文本..."
   },
   "timeline": {
     "title": "训练记录",
@@ -128,7 +135,7 @@
     "step5Title": "粘贴到Shuttle Lab",
     "step5Desc": "在Shuttle Lab的设置中粘贴您的密钥。点击保存，就完成了！",
     "safetyTitle": "安全吗？",
-    "safetyPoint1": "您的密钥仅存储在浏览器会话中——我们不会将其保存到任何数据库或与任何人共享。",
+    "safetyPoint1": "您的密钥在存储前会被加密，且不会与任何人共享。",
     "safetyPoint2": "您可以随时从OpenAI账户中删除或更改密钥。",
     "safetyPoint3": "在OpenAI账户上设置消费限额以控制成本。",
     "goToSettings": "前往设置添加密钥"

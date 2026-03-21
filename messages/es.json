@@ -47,6 +47,7 @@
   "programs": {
     "title": "Mis Programas de Entrenamiento",
     "empty": "Aún no hay programas. ¡Crea tu primer programa de entrenamiento!",
+    "guestWarning": "Estás usando Shuttle Lab como invitado. Tus programas guardados se perderán si no inicias sesión. Inicia sesión con Google para conservar tus datos.",
     "searchPlaceholder": "Buscar por título, tema o intensidad...",
     "aiGenerated": "Generado por IA",
     "custom": "Personalizado",
@@ -79,7 +80,13 @@
     "exerciseTips": "Consejos",
     "addExercise": "Agregar Ejercicio",
     "removeExercise": "Quitar",
-    "saveProgram": "Guardar Programa"
+    "saveProgram": "Guardar Programa",
+    "textTab": "Desde Texto",
+    "textLabel": "Describe tu programa de entrenamiento",
+    "textPlaceholder": "Escribe tu programa en texto libre. Por ejemplo:\n\nQuiero un programa de estrategia de dobles con 3 niveles. Empezar con posicionamiento básico y rotación, luego formaciones de ataque/defensa, y terminar con jugadas avanzadas. Cada ejercicio de 15-20 minutos con 2 jugadores por lado.",
+    "textHelp": "Escribe libremente — la IA convertirá tu descripción en un programa estructurado con niveles y ejercicios.",
+    "convertBtn": "Convertir a Programa",
+    "converting": "Convirtiendo tu texto..."
   },
   "timeline": {
     "title": "Registro de Entrenamiento",
@@ -128,7 +135,7 @@
     "step5Title": "Pégala en Shuttle Lab",
     "step5Desc": "Ve a Configuración en Shuttle Lab y pega tu clave. Haz clic en Guardar, ¡y listo!",
     "safetyTitle": "¿Es seguro?",
-    "safetyPoint1": "Tu clave se almacena solo en la sesión de tu navegador — nunca la guardamos en ninguna base de datos.",
+    "safetyPoint1": "Tu clave se cifra antes de almacenarse y nunca se comparte con nadie.",
     "safetyPoint2": "Puedes eliminar o cambiar tu clave en cualquier momento desde tu cuenta de OpenAI.",
     "safetyPoint3": "Establece un límite de gasto en tu cuenta de OpenAI para controlar los costos.",
     "goToSettings": "Ir a Configuración para Agregar Tu Clave"

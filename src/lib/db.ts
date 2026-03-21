@@ -1,5 +1,6 @@
 import pool, { initSchema } from "./pg";
 import { User, TrainingProgram, TrainingLogEntry } from "./types";
+import { encrypt, decrypt } from "./crypto";
 
 // Initialize schema on first import
 const schemaReady = initSchema();
@@ -35,7 +36,7 @@ export async function createUser(user: User): Promise<User> {
       user.email,
       user.name,
       user.isGuest,
-      user.openaiApiKey,
+      user.openaiApiKey ? encrypt(user.openaiApiKey) : null,
       user.locale,
       user.createdAt,
     ]
@@ -59,7 +60,7 @@ export async function updateUser(
       merged.email,
       merged.name,
       merged.isGuest,
-      merged.openaiApiKey,
+      merged.openaiApiKey ? encrypt(merged.openaiApiKey) : null,
       merged.locale,
     ]
   );
@@ -213,13 +214,23 @@ export async function deleteTrainingLogEntry(id: string): Promise<boolean> {
 }
 
 // Row mappers
+function decryptApiKey(raw: unknown): string | null {
+  if (!raw || typeof raw !== "string") return null;
+  try {
+    return decrypt(raw);
+  } catch {
+    // Legacy plaintext key — return as-is so existing users aren't broken
+    return raw;
+  }
+}
+
 function rowToUser(row: Record<string, unknown>): User {
   return {
     id: row.id as string,
     email: row.email as string | null,
     name: row.name as string,
     isGuest: row.is_guest as boolean,
-    openaiApiKey: row.openai_api_key as string | null,
+    openaiApiKey: decryptApiKey(row.openai_api_key),
     locale: row.locale as string,
     createdAt: row.created_at as string,
   };

@@ -3,11 +3,13 @@
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useAuth } from "./AuthProvider";
 import { TrainingProgram } from "@/lib/types";
 import { getPrograms, deleteProgramApi } from "@/lib/api";
 
 export default function ProgramList() {
   const t = useTranslations();
+  const { user } = useAuth();
   const [programs, setPrograms] = useState<TrainingProgram[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -48,6 +50,12 @@ export default function ProgramList() {
       <h1 className="text-3xl font-bold text-emerald-800 mb-6">
         {t("programs.title")}
       </h1>
+
+      {user?.isGuest && (
+        <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg mb-6 text-sm">
+          {t("programs.guestWarning")}
+        </div>
+      )}
 
       <div className="mb-6">
         <input

@@ -47,6 +47,7 @@
   "programs": {
     "title": "My Training Programs",
     "empty": "No programs yet. Create your first training program!",
+    "guestWarning": "You're using Shuttle Lab as a guest. Your saved programs will be lost if you don't sign in. Sign in with Google to keep your data.",
     "searchPlaceholder": "Search by title, theme, or intensity...",
     "aiGenerated": "AI Generated",
     "custom": "Custom",
@@ -79,7 +80,13 @@
     "exerciseTips": "Tips",
     "addExercise": "Add Exercise",
     "removeExercise": "Remove",
-    "saveProgram": "Save Program"
+    "saveProgram": "Save Program",
+    "textTab": "From Text",
+    "textLabel": "Describe your training program",
+    "textPlaceholder": "Write your program in plain text. For example:\n\nI want a doubles strategy program with 3 levels. Start with basic positioning and rotation, then move to attack/defense formations, and finish with advanced plays like drive-and-drop combinations. Each drill should be 15-20 minutes with 2 players on each side.",
+    "textHelp": "Write freely — the AI will convert your description into a structured program with levels and exercises.",
+    "convertBtn": "Convert to Program",
+    "converting": "Converting your text..."
   },
   "timeline": {
     "title": "Training Log",
@@ -128,7 +135,7 @@
     "step5Title": "Paste it in Shuttle Lab",
     "step5Desc": "Go to Settings in Shuttle Lab and paste your key in the OpenAI API Key field. Click Save, and you're all set!",
     "safetyTitle": "Is it safe?",
-    "safetyPoint1": "Your key is stored only in your browser session — we never save it to any database or share it with anyone.",
+    "safetyPoint1": "Your key is encrypted before being stored and is never shared with anyone.",
     "safetyPoint2": "You can delete or change your key anytime from your OpenAI account.",
     "safetyPoint3": "Set a spending limit on your OpenAI account to stay in control of costs.",
     "goToSettings": "Go to Settings to Add Your Key"
