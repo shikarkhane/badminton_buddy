@@ -73,11 +73,32 @@ export async function GET() {
       );
     }
 
-    const parsed = JSON.parse(content);
+    // Strip markdown code fences if present
+    const fenceMatch = content.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/);
+    const jsonStr = fenceMatch ? fenceMatch[1].trim() : content.trim();
+
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonStr);
+    } catch {
+      // If AI response isn't valid JSON, return a basic suggestion
+      return NextResponse.json({
+        suggestion: content.trim(),
+        reasoning: "AI-generated suggestion",
+      });
+    }
     return NextResponse.json(parsed);
   } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : "Failed to get suggestion";
-    return NextResponse.json({ error: message }, { status: 500 });
+    // On OpenAI errors, fall back to rule-based suggestion
+    const themes = recentSessions.map((s) => s.theme);
+    const uniqueThemes = [...new Set(themes)];
+    const allThemes = ["Footwork", "Net Play", "Smash Power", "Defense Drills", "Doubles Strategy", "Serve Accuracy"];
+    const unused = allThemes.find((t) => !uniqueThemes.includes(t)) || "Footwork Fundamentals";
+    const errorMsg = error instanceof Error ? error.message : "";
+
+    return NextResponse.json({
+      suggestion: unused,
+      reasoning: `Suggested based on your recent themes: ${themes.join(", ")}. (AI unavailable: ${errorMsg})`,
+    });
   }
 }
