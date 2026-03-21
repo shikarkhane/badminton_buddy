@@ -40,6 +40,12 @@ export default function Navbar() {
               {t("nav.timeline")}
             </Link>
             <Link
+              href="/org"
+              className="hover:text-emerald-200 transition"
+            >
+              {t("nav.organization")}
+            </Link>
+            <Link
               href="/settings"
               className="hover:text-emerald-200 transition"
             >
@@ -109,6 +115,13 @@ export default function Navbar() {
               onClick={() => setMenuOpen(false)}
             >
               {t("nav.timeline")}
+            </Link>
+            <Link
+              href="/org"
+              className="block py-2 hover:text-emerald-200"
+              onClick={() => setMenuOpen(false)}
+            >
+              {t("nav.organization")}
             </Link>
             <Link
               href="/settings"

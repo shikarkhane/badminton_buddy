@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
     levels: body.levels,
     isCustom: body.isCustom || false,
     isAIGenerated: body.isAIGenerated || false,
+    sharedWithOrg: body.sharedWithOrg || null,
     createdAt: now,
     updatedAt: now,
   };

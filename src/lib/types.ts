@@ -32,6 +32,7 @@ export interface TrainingProgram {
   levels: TrainingLevel[];
   isCustom: boolean;
   isAIGenerated: boolean;
+  sharedWithOrg: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -46,4 +47,31 @@ export interface TrainingLogEntry {
   notes: string;
   date: string;
   createdAt: string;
+}
+
+export interface Organization {
+  id: string;
+  name: string;
+  ownerId: string;
+  createdAt: string;
+}
+
+export interface OrgMember {
+  id: string;
+  orgId: string;
+  userId: string;
+  role: "owner" | "admin" | "member";
+  joinedAt: string;
+  userName?: string;
+  userEmail?: string | null;
+}
+
+export interface OrgInvitation {
+  id: string;
+  orgId: string;
+  email: string;
+  invitedBy: string;
+  status: "pending" | "accepted" | "declined";
+  createdAt: string;
+  orgName?: string;
 }

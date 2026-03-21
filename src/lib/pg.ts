@@ -81,6 +81,39 @@ export async function initSchema() {
     CREATE INDEX IF NOT EXISTS idx_programs_user_id ON programs(user_id);
     CREATE INDEX IF NOT EXISTS idx_training_log_user_id ON training_log(user_id);
     CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+
+    CREATE TABLE IF NOT EXISTS organizations (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      owner_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS org_members (
+      id TEXT PRIMARY KEY,
+      org_id TEXT NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      role TEXT NOT NULL DEFAULT 'member',
+      joined_at TEXT NOT NULL,
+      UNIQUE(org_id, user_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS org_invitations (
+      id TEXT PRIMARY KEY,
+      org_id TEXT NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+      email TEXT NOT NULL,
+      invited_by TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      status TEXT NOT NULL DEFAULT 'pending',
+      created_at TEXT NOT NULL,
+      UNIQUE(org_id, email)
+    );
+
+    ALTER TABLE programs ADD COLUMN IF NOT EXISTS shared_with_org TEXT DEFAULT NULL;
+
+    CREATE INDEX IF NOT EXISTS idx_org_members_org_id ON org_members(org_id);
+    CREATE INDEX IF NOT EXISTS idx_org_members_user_id ON org_members(user_id);
+    CREATE INDEX IF NOT EXISTS idx_org_invitations_email ON org_invitations(email);
+    CREATE INDEX IF NOT EXISTS idx_programs_shared ON programs(shared_with_org);
   `);
 
   schemaInitialized = true;

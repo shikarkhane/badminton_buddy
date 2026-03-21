@@ -1,5 +1,5 @@
 import pool, { initSchema } from "./pg";
-import { User, TrainingProgram, TrainingLogEntry } from "./types";
+import { User, TrainingProgram, TrainingLogEntry, Organization, OrgMember, OrgInvitation } from "./types";
 import { encrypt, decrypt } from "./crypto";
 
 // Initialize schema on first import
@@ -109,8 +109,8 @@ export async function createProgram(
 ): Promise<TrainingProgram> {
   await ready();
   await pool.query(
-    `INSERT INTO programs (id, user_id, title, theme, intensity, levels, is_custom, is_ai_generated, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+    `INSERT INTO programs (id, user_id, title, theme, intensity, levels, is_custom, is_ai_generated, shared_with_org, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
     [
       program.id,
       program.userId,
@@ -120,6 +120,7 @@ export async function createProgram(
       JSON.stringify(program.levels),
       program.isCustom,
       program.isAIGenerated,
+      program.sharedWithOrg || null,
       program.createdAt,
       program.updatedAt,
     ]
@@ -137,7 +138,7 @@ export async function updateProgram(
   const merged = { ...existing, ...updates, updatedAt: new Date().toISOString() };
   await pool.query(
     `UPDATE programs SET title=$2, theme=$3, intensity=$4, levels=$5,
-     is_custom=$6, is_ai_generated=$7, updated_at=$8
+     is_custom=$6, is_ai_generated=$7, shared_with_org=$8, updated_at=$9
      WHERE id=$1`,
     [
       id,
@@ -147,6 +148,7 @@ export async function updateProgram(
       JSON.stringify(merged.levels),
       merged.isCustom,
       merged.isAIGenerated,
+      merged.sharedWithOrg || null,
       merged.updatedAt,
     ]
   );
@@ -213,6 +215,159 @@ export async function deleteTrainingLogEntry(id: string): Promise<boolean> {
   return (result.rowCount ?? 0) > 0;
 }
 
+// Organizations
+export async function createOrganization(org: Organization): Promise<Organization> {
+  await ready();
+  await pool.query(
+    `INSERT INTO organizations (id, name, owner_id, created_at) VALUES ($1, $2, $3, $4)`,
+    [org.id, org.name, org.ownerId, org.createdAt]
+  );
+  return org;
+}
+
+export async function getOrganization(id: string): Promise<Organization | undefined> {
+  await ready();
+  const { rows } = await pool.query("SELECT * FROM organizations WHERE id = $1", [id]);
+  return rows[0] ? rowToOrg(rows[0]) : undefined;
+}
+
+export async function getUserOrganizations(userId: string): Promise<Organization[]> {
+  await ready();
+  const { rows } = await pool.query(
+    `SELECT o.* FROM organizations o
+     JOIN org_members m ON m.org_id = o.id
+     WHERE m.user_id = $1
+     ORDER BY o.name`,
+    [userId]
+  );
+  return rows.map(rowToOrg);
+}
+
+export async function updateOrganization(id: string, name: string): Promise<Organization | undefined> {
+  await ready();
+  const { rows } = await pool.query(
+    `UPDATE organizations SET name=$2 WHERE id=$1 RETURNING *`,
+    [id, name]
+  );
+  return rows[0] ? rowToOrg(rows[0]) : undefined;
+}
+
+export async function deleteOrganization(id: string): Promise<boolean> {
+  await ready();
+  const result = await pool.query("DELETE FROM organizations WHERE id = $1", [id]);
+  return (result.rowCount ?? 0) > 0;
+}
+
+// Org Members
+export async function addOrgMember(member: OrgMember): Promise<OrgMember> {
+  await ready();
+  await pool.query(
+    `INSERT INTO org_members (id, org_id, user_id, role, joined_at) VALUES ($1, $2, $3, $4, $5)
+     ON CONFLICT (org_id, user_id) DO NOTHING`,
+    [member.id, member.orgId, member.userId, member.role, member.joinedAt]
+  );
+  return member;
+}
+
+export async function getOrgMembers(orgId: string): Promise<OrgMember[]> {
+  await ready();
+  const { rows } = await pool.query(
+    `SELECT m.*, u.name as user_name, u.email as user_email
+     FROM org_members m JOIN users u ON u.id = m.user_id
+     WHERE m.org_id = $1 ORDER BY m.joined_at`,
+    [orgId]
+  );
+  return rows.map(rowToOrgMember);
+}
+
+export async function removeOrgMember(orgId: string, userId: string): Promise<boolean> {
+  await ready();
+  const result = await pool.query(
+    "DELETE FROM org_members WHERE org_id = $1 AND user_id = $2",
+    [orgId, userId]
+  );
+  return (result.rowCount ?? 0) > 0;
+}
+
+export async function isOrgMember(orgId: string, userId: string): Promise<boolean> {
+  await ready();
+  const { rows } = await pool.query(
+    "SELECT 1 FROM org_members WHERE org_id = $1 AND user_id = $2",
+    [orgId, userId]
+  );
+  return rows.length > 0;
+}
+
+// Org Invitations
+export async function createInvitation(invitation: OrgInvitation): Promise<OrgInvitation> {
+  await ready();
+  await pool.query(
+    `INSERT INTO org_invitations (id, org_id, email, invited_by, status, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6)
+     ON CONFLICT (org_id, email) DO UPDATE SET status='pending', created_at=$6`,
+    [invitation.id, invitation.orgId, invitation.email, invitation.invitedBy, invitation.status, invitation.createdAt]
+  );
+  return invitation;
+}
+
+export async function getPendingInvitations(email: string): Promise<OrgInvitation[]> {
+  await ready();
+  const { rows } = await pool.query(
+    `SELECT i.*, o.name as org_name FROM org_invitations i
+     JOIN organizations o ON o.id = i.org_id
+     WHERE i.email = $1 AND i.status = 'pending'
+     ORDER BY i.created_at DESC`,
+    [email]
+  );
+  return rows.map(rowToInvitation);
+}
+
+export async function getOrgInvitations(orgId: string): Promise<OrgInvitation[]> {
+  await ready();
+  const { rows } = await pool.query(
+    `SELECT i.*, o.name as org_name FROM org_invitations i
+     JOIN organizations o ON o.id = i.org_id
+     WHERE i.org_id = $1 ORDER BY i.created_at DESC`,
+    [orgId]
+  );
+  return rows.map(rowToInvitation);
+}
+
+export async function updateInvitationStatus(id: string, status: string): Promise<OrgInvitation | undefined> {
+  await ready();
+  const { rows } = await pool.query(
+    `UPDATE org_invitations SET status=$2 WHERE id=$1 RETURNING *`,
+    [id, status]
+  );
+  return rows[0] ? rowToInvitation(rows[0]) : undefined;
+}
+
+export async function getInvitation(id: string): Promise<OrgInvitation | undefined> {
+  await ready();
+  const { rows } = await pool.query(
+    `SELECT i.*, o.name as org_name FROM org_invitations i
+     JOIN organizations o ON o.id = i.org_id WHERE i.id = $1`,
+    [id]
+  );
+  return rows[0] ? rowToInvitation(rows[0]) : undefined;
+}
+
+export async function deleteInvitation(id: string): Promise<boolean> {
+  await ready();
+  const result = await pool.query("DELETE FROM org_invitations WHERE id = $1", [id]);
+  return (result.rowCount ?? 0) > 0;
+}
+
+// Shared programs — programs shared with an org that the user is a member of
+export async function getOrgSharedPrograms(orgId: string): Promise<TrainingProgram[]> {
+  await ready();
+  const { rows } = await pool.query(
+    `SELECT * FROM programs WHERE shared_with_org = $1 ORDER BY created_at DESC`,
+    [orgId]
+  );
+  return rows.map(rowToProgram);
+}
+
 // Row mappers
 function decryptApiKey(raw: unknown): string | null {
   if (!raw || typeof raw !== "string") return null;
@@ -249,6 +404,7 @@ function rowToProgram(row: Record<string, unknown>): TrainingProgram {
         : (row.levels as TrainingProgram["levels"]),
     isCustom: row.is_custom as boolean,
     isAIGenerated: row.is_ai_generated as boolean,
+    sharedWithOrg: (row.shared_with_org as string | null) || null,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
   };
@@ -265,5 +421,38 @@ function rowToLogEntry(row: Record<string, unknown>): TrainingLogEntry {
     notes: row.notes as string,
     date: row.date as string,
     createdAt: row.created_at as string,
+  };
+}
+
+function rowToOrg(row: Record<string, unknown>): Organization {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    ownerId: row.owner_id as string,
+    createdAt: row.created_at as string,
+  };
+}
+
+function rowToOrgMember(row: Record<string, unknown>): OrgMember {
+  return {
+    id: row.id as string,
+    orgId: row.org_id as string,
+    userId: row.user_id as string,
+    role: row.role as OrgMember["role"],
+    joinedAt: row.joined_at as string,
+    userName: row.user_name as string | undefined,
+    userEmail: row.user_email as string | null | undefined,
+  };
+}
+
+function rowToInvitation(row: Record<string, unknown>): OrgInvitation {
+  return {
+    id: row.id as string,
+    orgId: row.org_id as string,
+    email: row.email as string,
+    invitedBy: row.invited_by as string,
+    status: row.status as OrgInvitation["status"],
+    createdAt: row.created_at as string,
+    orgName: row.org_name as string | undefined,
   };
 }

@@ -1,4 +1,4 @@
-import { User, TrainingProgram, TrainingLogEntry } from "./types";
+import { User, TrainingProgram, TrainingLogEntry, Organization, OrgMember, OrgInvitation } from "./types";
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, {
@@ -135,6 +135,77 @@ export async function logTrainingSession(data: {
     method: "POST",
     body: JSON.stringify(data),
   });
+}
+
+// Organizations
+export async function getOrgs(): Promise<{ orgs: Organization[] }> {
+  return fetchJson("/api/orgs");
+}
+
+export async function createOrg(name: string): Promise<{ org: Organization }> {
+  return fetchJson("/api/orgs", {
+    method: "POST",
+    body: JSON.stringify({ name }),
+  });
+}
+
+export async function getOrg(orgId: string): Promise<{ org: Organization }> {
+  return fetchJson(`/api/orgs/${orgId}`);
+}
+
+export async function updateOrg(orgId: string, name: string): Promise<{ org: Organization }> {
+  return fetchJson(`/api/orgs/${orgId}`, {
+    method: "PUT",
+    body: JSON.stringify({ name }),
+  });
+}
+
+export async function deleteOrg(orgId: string): Promise<void> {
+  await fetchJson(`/api/orgs/${orgId}`, { method: "DELETE" });
+}
+
+export async function getOrgMembers(orgId: string): Promise<{ members: OrgMember[] }> {
+  return fetchJson(`/api/orgs/${orgId}/members`);
+}
+
+export async function removeOrgMember(orgId: string, userId: string): Promise<void> {
+  await fetchJson(`/api/orgs/${orgId}/members`, {
+    method: "DELETE",
+    body: JSON.stringify({ userId }),
+  });
+}
+
+export async function inviteToOrg(orgId: string, email: string): Promise<{ invitation: OrgInvitation }> {
+  return fetchJson(`/api/orgs/${orgId}/invitations`, {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function getOrgInvitations(orgId: string): Promise<{ invitations: OrgInvitation[] }> {
+  return fetchJson(`/api/orgs/${orgId}/invitations`);
+}
+
+export async function cancelInvitation(orgId: string, invitationId: string): Promise<void> {
+  await fetchJson(`/api/orgs/${orgId}/invitations`, {
+    method: "DELETE",
+    body: JSON.stringify({ invitationId }),
+  });
+}
+
+export async function getMyInvitations(): Promise<{ invitations: OrgInvitation[] }> {
+  return fetchJson("/api/invitations");
+}
+
+export async function respondToInvitation(id: string, action: "accept" | "decline"): Promise<void> {
+  await fetchJson(`/api/invitations/${id}`, {
+    method: "PUT",
+    body: JSON.stringify({ action }),
+  });
+}
+
+export async function getOrgPrograms(orgId: string): Promise<{ programs: TrainingProgram[] }> {
+  return fetchJson(`/api/orgs/${orgId}/programs`);
 }
 
 // Suggestions

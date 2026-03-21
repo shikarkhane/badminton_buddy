@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { getProgram, updateProgram, deleteProgram } from "@/lib/db";
+import { getProgram, updateProgram, deleteProgram, isOrgMember } from "@/lib/db";
 
 export async function GET(
   _request: NextRequest,
@@ -13,7 +13,17 @@ export async function GET(
 
   const { id } = await params;
   const program = await getProgram(id);
-  if (!program || program.userId !== user.id) {
+  if (!program) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  // Allow access if user owns the program or is a member of the shared org
+  const isOwner = program.userId === user.id;
+  const isMember = program.sharedWithOrg
+    ? await isOrgMember(program.sharedWithOrg, user.id)
+    : false;
+
+  if (!isOwner && !isMember) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 

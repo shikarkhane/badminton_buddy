@@ -3,18 +3,26 @@
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { TrainingProgram } from "@/lib/types";
-import { getProgram, logTrainingSession } from "@/lib/api";
+import { useAuth } from "./AuthProvider";
+import { TrainingProgram, Organization } from "@/lib/types";
+import { getProgram, logTrainingSession, updateProgramApi, getOrgs } from "@/lib/api";
 
 export default function ProgramDetail({ programId }: { programId: string }) {
   const t = useTranslations();
   const router = useRouter();
+  const { user } = useAuth();
   const [program, setProgram] = useState<TrainingProgram | null>(null);
   const [loading, setLoading] = useState(true);
-  // All levels shown expanded by default
   const [logging, setLogging] = useState(false);
   const [logLevel, setLogLevel] = useState(1);
   const [logNotes, setLogNotes] = useState("");
+  const [userOrgs, setUserOrgs] = useState<Organization[]>([]);
+
+  useEffect(() => {
+    if (user && !user.isGuest) {
+      getOrgs().then(({ orgs }) => setUserOrgs(orgs)).catch(() => {});
+    }
+  }, [user]);
 
   useEffect(() => {
     async function load() {
@@ -82,6 +90,51 @@ export default function ProgramDetail({ programId }: { programId: string }) {
             </div>
           </div>
         </div>
+
+        {/* Share with org */}
+        {user && program.userId === user.id && userOrgs.length > 0 && (
+          <div className="bg-gray-50 rounded-lg p-4 mb-4 flex flex-wrap items-center gap-3">
+            <span className="text-sm font-medium text-gray-700">{t("org.shareWithOrg")}:</span>
+            {program.sharedWithOrg ? (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-emerald-700 font-medium">
+                  {userOrgs.find((o) => o.id === program.sharedWithOrg)?.name || t("org.sharedBadge")}
+                </span>
+                <button
+                  onClick={async () => {
+                    const updated = await updateProgramApi(program.id, { sharedWithOrg: null });
+                    setProgram(updated.program);
+                  }}
+                  className="text-red-500 hover:text-red-700 text-sm"
+                >
+                  {t("org.unshare")}
+                </button>
+              </div>
+            ) : (
+              <select
+                defaultValue=""
+                onChange={async (e) => {
+                  if (!e.target.value) return;
+                  const updated = await updateProgramApi(program.id, { sharedWithOrg: e.target.value });
+                  setProgram(updated.program);
+                }}
+                className="border border-gray-300 rounded px-3 py-1 text-sm"
+              >
+                <option value="">--</option>
+                {userOrgs.map((org) => (
+                  <option key={org.id} value={org.id}>{org.name}</option>
+                ))}
+              </select>
+            )}
+          </div>
+        )}
+
+        {/* Shared badge for non-owners */}
+        {user && program.userId !== user.id && program.sharedWithOrg && (
+          <div className="bg-blue-50 border border-blue-200 text-blue-700 text-sm px-4 py-2 rounded-lg mb-4">
+            {t("org.sharedBadge")}
+          </div>
+        )}
 
         {/* Use Today section */}
         <div className="bg-emerald-50 rounded-lg p-4 mb-6">
