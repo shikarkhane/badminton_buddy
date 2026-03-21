@@ -7,9 +7,9 @@ export async function POST(request: NextRequest) {
 
   let user;
   if (type === "google" && email) {
-    user = loginWithGoogle(email, name || email.split("@")[0]);
+    user = await loginWithGoogle(email, name || email.split("@")[0]);
   } else {
-    user = createGuestUser();
+    user = await createGuestUser();
   }
 
   const response = NextResponse.json({ user });

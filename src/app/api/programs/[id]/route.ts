@@ -12,7 +12,7 @@ export async function GET(
   }
 
   const { id } = await params;
-  const program = getProgram(id);
+  const program = await getProgram(id);
   if (!program || program.userId !== user.id) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -30,13 +30,13 @@ export async function PUT(
   }
 
   const { id } = await params;
-  const program = getProgram(id);
+  const program = await getProgram(id);
   if (!program || program.userId !== user.id) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
   const body = await request.json();
-  const updated = updateProgram(id, body);
+  const updated = await updateProgram(id, body);
   return NextResponse.json({ program: updated });
 }
 
@@ -50,11 +50,11 @@ export async function DELETE(
   }
 
   const { id } = await params;
-  const program = getProgram(id);
+  const program = await getProgram(id);
   if (!program || program.userId !== user.id) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  deleteProgram(id);
+  await deleteProgram(id);
   return NextResponse.json({ ok: true });
 }

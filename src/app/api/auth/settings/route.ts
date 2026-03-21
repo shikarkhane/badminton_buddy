@@ -15,7 +15,7 @@ export async function PUT(request: NextRequest) {
   if (openaiApiKey !== undefined) updates.openaiApiKey = openaiApiKey;
   if (locale !== undefined) updates.locale = locale;
 
-  const updated = updateUser(user.id, updates);
+  const updated = await updateUser(user.id, updates);
 
   const response = NextResponse.json({ user: updated });
 

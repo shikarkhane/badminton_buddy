@@ -9,7 +9,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const log = getUserTrainingLog(user.id);
+  const log = await getUserTrainingLog(user.id);
   return NextResponse.json({ log });
 }
 
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json();
 
-  const entry = createTrainingLogEntry({
+  const entry = await createTrainingLogEntry({
     id: uuidv4(),
     userId: user.id,
     programId: body.programId,
@@ -43,6 +43,6 @@ export async function DELETE(request: NextRequest) {
   }
 
   const { id } = await request.json();
-  deleteTrainingLogEntry(id);
+  await deleteTrainingLogEntry(id);
   return NextResponse.json({ ok: true });
 }

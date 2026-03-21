@@ -4,14 +4,14 @@ import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { TrainingProgram } from "@/lib/types";
-import { getProgram, logTrainingSession, getPrograms } from "@/lib/api";
+import { getProgram, logTrainingSession } from "@/lib/api";
 
 export default function ProgramDetail({ programId }: { programId: string }) {
   const t = useTranslations();
   const router = useRouter();
   const [program, setProgram] = useState<TrainingProgram | null>(null);
   const [loading, setLoading] = useState(true);
-  const [expandedLevel, setExpandedLevel] = useState<number | null>(0);
+  // All levels shown expanded by default
   const [logging, setLogging] = useState(false);
   const [logLevel, setLogLevel] = useState(1);
   const [logNotes, setLogNotes] = useState("");
@@ -121,43 +121,36 @@ export default function ProgramDetail({ programId }: { programId: string }) {
           </div>
         </div>
 
-        {/* Levels */}
-        <div className="space-y-4">
-          {program.levels.map((level, idx) => (
+        {/* Levels — all expanded */}
+        <div className="space-y-6">
+          {program.levels.map((level) => (
             <div key={level.level} className="border border-gray-200 rounded-lg overflow-hidden">
-              <button
-                onClick={() => setExpandedLevel(expandedLevel === idx ? null : idx)}
-                className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 transition"
-              >
-                <span className="font-semibold text-gray-800">
+              <div className="p-4 bg-gray-50 border-b border-gray-200">
+                <h3 className="font-semibold text-gray-800 text-lg">
                   Level {level.level}: {level.title}
-                </span>
-                <svg
-                  className={`w-5 h-5 text-gray-400 transition-transform ${expandedLevel === idx ? "rotate-180" : ""}`}
-                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {expandedLevel === idx && (
-                <div className="p-4">
-                  <p className="text-gray-600 mb-4">{level.description}</p>
-                  <div className="space-y-3">
-                    {level.exercises.map((ex, exIdx) => (
-                      <div key={exIdx} className="bg-gray-50 rounded-lg p-4">
-                        <h4 className="font-semibold text-gray-800">{ex.name}</h4>
-                        <p className="text-gray-600 text-sm mt-1">{ex.description}</p>
-                        <div className="flex gap-4 mt-2 text-sm text-gray-500">
-                          <span>Duration: {ex.duration}</span>
-                          {ex.reps && <span>Reps: {ex.reps}</span>}
-                        </div>
-                        <p className="text-emerald-700 text-sm mt-2 italic">Tip: {ex.tips}</p>
+                </h3>
+                {level.description && (
+                  <p className="text-gray-600 text-sm mt-1">{level.description}</p>
+                )}
+              </div>
+              <ul className="divide-y divide-gray-100">
+                {level.exercises.map((ex, exIdx) => (
+                  <li key={exIdx} className="p-4 flex gap-4">
+                    <span className="text-emerald-600 font-bold text-lg mt-0.5">{exIdx + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-gray-800">{ex.name}</h4>
+                      <p className="text-gray-600 text-sm mt-0.5">{ex.description}</p>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-500">
+                        <span>Duration: {ex.duration}</span>
+                        {ex.reps && <span>Reps: {ex.reps}</span>}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+                      {ex.tips && (
+                        <p className="text-emerald-700 text-sm mt-1.5 italic">Tip: {ex.tips}</p>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>

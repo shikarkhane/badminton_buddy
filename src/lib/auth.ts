@@ -9,13 +9,13 @@ export async function getCurrentUser(): Promise<User | null> {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get(SESSION_COOKIE)?.value;
   if (!sessionId) return null;
-  return getUser(sessionId) || null;
+  return (await getUser(sessionId)) || null;
 }
 
-export function loginWithGoogle(email: string, name: string): User {
-  let user = getUserByEmail(email);
+export async function loginWithGoogle(email: string, name: string): Promise<User> {
+  let user = await getUserByEmail(email);
   if (!user) {
-    user = createUser({
+    user = await createUser({
       id: uuidv4(),
       email,
       name,
@@ -28,8 +28,8 @@ export function loginWithGoogle(email: string, name: string): User {
   return user;
 }
 
-export function createGuestUser(): User {
-  return createUser({
+export async function createGuestUser(): Promise<User> {
+  return await createUser({
     id: uuidv4(),
     email: null,
     name: "Guest",

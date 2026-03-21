@@ -12,8 +12,8 @@ export async function GET(request: NextRequest) {
 
   const query = request.nextUrl.searchParams.get("q");
   const programs = query
-    ? searchPrograms(user.id, query)
-    : getUserPrograms(user.id);
+    ? await searchPrograms(user.id, query)
+    : await getUserPrograms(user.id);
 
   return NextResponse.json({ programs });
 }
@@ -40,6 +40,6 @@ export async function POST(request: NextRequest) {
     updatedAt: now,
   };
 
-  createProgram(program);
+  await createProgram(program);
   return NextResponse.json({ program }, { status: 201 });
 }

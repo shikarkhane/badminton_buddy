@@ -6,13 +6,10 @@ import { cookies } from "next/headers";
 export async function GET() {
   const user = await getCurrentUser();
   if (!user) {
-    // Check if there's a session cookie — the user may exist but the
-    // in-memory DB was cleared (server restart). Re-create as guest
-    // so the session stays alive.
     const cookieStore = await cookies();
     const sessionId = cookieStore.get(getSessionCookieName())?.value;
-    if (sessionId && !getUser(sessionId)) {
-      const restored = createUser({
+    if (sessionId && !(await getUser(sessionId))) {
+      const restored = await createUser({
         id: sessionId,
         email: null,
         name: "Guest",
