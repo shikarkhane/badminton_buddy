@@ -11,18 +11,29 @@ export default function Settings() {
   const { user, refreshUser } = useAuth();
   const [apiKey, setApiKey] = useState(user?.openaiApiKey || "");
   const [locale, setLocale] = useState(user?.locale || "en");
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSave = async () => {
-    await updateSettings({
-      openaiApiKey: apiKey,
-      locale,
-    });
-    await refreshUser();
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
-    if (locale !== user?.locale) {
-      window.location.reload();
+    setSaving(true);
+    setError("");
+    setSaved(false);
+    try {
+      await updateSettings({
+        openaiApiKey: apiKey,
+        locale,
+      });
+      await refreshUser();
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+      if (locale !== user?.locale) {
+        window.location.reload();
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to save settings. Please try logging in again.");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -31,6 +42,12 @@ export default function Settings() {
       <h1 className="text-3xl font-bold text-emerald-800 mb-6">
         {t("settings.title")}
       </h1>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          {error}
+        </div>
+      )}
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-6">
         <div>
@@ -72,13 +89,16 @@ export default function Settings() {
 
         <button
           onClick={handleSave}
-          className="bg-emerald-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-emerald-700 transition"
+          disabled={saving}
+          className="bg-emerald-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-emerald-700 transition disabled:opacity-50"
         >
-          {t("common.save")}
+          {saving ? t("common.loading") : t("common.save")}
         </button>
 
         {saved && (
-          <p className="text-emerald-600 font-medium">{t("settings.saved")}</p>
+          <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg">
+            {t("settings.saved")}
+          </div>
         )}
       </div>
     </div>
