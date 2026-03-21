@@ -4,11 +4,17 @@ const pool = new Pool({
   connectionString:
     process.env.DATABASE_URL ||
     "postgresql://bbuser:bbpass@localhost:5432/badminton_buddy",
+  max: 10,
+  connectionTimeoutMillis: 5000,
 });
 
 export default pool;
 
+let schemaInitialized = false;
+
 export async function initSchema() {
+  if (schemaInitialized) return;
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
@@ -49,4 +55,6 @@ export async function initSchema() {
     CREATE INDEX IF NOT EXISTS idx_training_log_user_id ON training_log(user_id);
     CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
   `);
+
+  schemaInitialized = true;
 }

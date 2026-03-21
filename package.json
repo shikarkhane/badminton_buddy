@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "bash scripts/ensure-db.sh",
     "dev": "next dev",
+    "prebuild": "bash scripts/ensure-db.sh",
     "build": "next build",
+    "prestart": "bash scripts/ensure-db.sh",
     "start": "next start",
     "lint": "eslint"
   },
