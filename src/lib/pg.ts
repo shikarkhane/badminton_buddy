@@ -114,6 +114,29 @@ export async function initSchema() {
     CREATE INDEX IF NOT EXISTS idx_org_members_user_id ON org_members(user_id);
     CREATE INDEX IF NOT EXISTS idx_org_invitations_email ON org_invitations(email);
     CREATE INDEX IF NOT EXISTS idx_programs_shared ON programs(shared_with_org);
+
+    CREATE TABLE IF NOT EXISTS community_threads (
+      id TEXT PRIMARY KEY,
+      org_id TEXT NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+      category TEXT NOT NULL DEFAULT 'general',
+      title TEXT NOT NULL,
+      author_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      pinned BOOLEAN NOT NULL DEFAULT false,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS community_posts (
+      id TEXT PRIMARY KEY,
+      thread_id TEXT NOT NULL REFERENCES community_threads(id) ON DELETE CASCADE,
+      author_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      content TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_threads_org ON community_threads(org_id);
+    CREATE INDEX IF NOT EXISTS idx_threads_category ON community_threads(org_id, category);
+    CREATE INDEX IF NOT EXISTS idx_posts_thread ON community_posts(thread_id);
   `);
 
   schemaInitialized = true;

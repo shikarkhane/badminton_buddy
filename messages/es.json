@@ -23,7 +23,8 @@
     "create": "Crear Programa",
     "timeline": "Registro de Entrenamiento",
     "settings": "Configuración",
-    "organization": "Organización"
+    "organization": "Organización",
+    "community": "Comunidad"
   },
   "landing": {
     "heroTitle": "Mejora Tu Juego de Bádminton",
@@ -174,6 +175,36 @@
     "unshare": "Dejar de Compartir",
     "sharedBadge": "Compartido",
     "sharedBy": "Compartido por"
+  },
+  "community": {
+    "title": "Comunidad",
+    "selectOrg": "Selecciona una organización para ver su comunidad",
+    "noOrg": "Únete o crea una organización para acceder a la comunidad.",
+    "general": "General",
+    "feedback": "Comentarios",
+    "ideas": "Ideas",
+    "allThreads": "Todos",
+    "threads": "Hilos",
+    "noThreads": "Aún no hay discusiones. ¡Inicia un nuevo hilo!",
+    "newThread": "Nuevo Hilo",
+    "threadTitle": "Título del Hilo",
+    "threadTitlePlaceholder": "¿Qué quieres discutir?",
+    "category": "Categoría",
+    "firstPost": "Tu mensaje",
+    "firstPostPlaceholder": "Comparte tus pensamientos, preguntas o ideas...",
+    "createThread": "Publicar Hilo",
+    "creating": "Publicando...",
+    "reply": "Responder",
+    "replyPlaceholder": "Escribe una respuesta...",
+    "postReply": "Publicar Respuesta",
+    "posting": "Publicando...",
+    "deleteThread": "Eliminar Hilo",
+    "posts": "respuestas",
+    "moderating": "Verificando contenido...",
+    "moderationFailed": "Tu mensaje no fue aprobado: ",
+    "backToThreads": "Volver a los hilos",
+    "by": "por",
+    "pinned": "Fijado"
   },
   "intensity": {
     "low": "Baja",

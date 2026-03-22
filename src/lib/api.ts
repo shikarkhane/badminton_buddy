@@ -1,4 +1,4 @@
-import { User, TrainingProgram, TrainingLogEntry, Organization, OrgMember, OrgInvitation } from "./types";
+import { User, TrainingProgram, TrainingLogEntry, Organization, OrgMember, OrgInvitation, CommunityThread, CommunityPost, ThreadCategory } from "./types";
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, {
@@ -206,6 +206,47 @@ export async function respondToInvitation(id: string, action: "accept" | "declin
 
 export async function getOrgPrograms(orgId: string): Promise<{ programs: TrainingProgram[] }> {
   return fetchJson(`/api/orgs/${orgId}/programs`);
+}
+
+// Community
+export async function moderateContent(content: string): Promise<{ approved: boolean; reason?: string }> {
+  return fetchJson("/api/community/moderate", {
+    method: "POST",
+    body: JSON.stringify({ content }),
+  });
+}
+
+export async function getOrgThreads(orgId: string, category?: ThreadCategory): Promise<{ threads: CommunityThread[] }> {
+  const url = category
+    ? `/api/orgs/${orgId}/community?category=${category}`
+    : `/api/orgs/${orgId}/community`;
+  return fetchJson(url);
+}
+
+export async function createThread(orgId: string, data: { title: string; category: ThreadCategory; content: string }): Promise<{ thread: CommunityThread; post: CommunityPost }> {
+  return fetchJson(`/api/orgs/${orgId}/community`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function getThreadDetail(orgId: string, threadId: string): Promise<{ thread: CommunityThread }> {
+  return fetchJson(`/api/orgs/${orgId}/community/threads/${threadId}`);
+}
+
+export async function deleteThread(orgId: string, threadId: string): Promise<void> {
+  await fetchJson(`/api/orgs/${orgId}/community/threads/${threadId}`, { method: "DELETE" });
+}
+
+export async function getThreadPosts(orgId: string, threadId: string): Promise<{ posts: CommunityPost[] }> {
+  return fetchJson(`/api/orgs/${orgId}/community/threads/${threadId}/posts`);
+}
+
+export async function createPostReply(orgId: string, threadId: string, content: string): Promise<{ post: CommunityPost }> {
+  return fetchJson(`/api/orgs/${orgId}/community/threads/${threadId}/posts`, {
+    method: "POST",
+    body: JSON.stringify({ content }),
+  });
 }
 
 // Suggestions

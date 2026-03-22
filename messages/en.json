@@ -23,7 +23,8 @@
     "create": "Create Program",
     "timeline": "Training Log",
     "settings": "Settings",
-    "organization": "Organization"
+    "organization": "Organization",
+    "community": "Community"
   },
   "landing": {
     "heroTitle": "Elevate Your Badminton Game",
@@ -174,6 +175,36 @@
     "unshare": "Stop Sharing",
     "sharedBadge": "Shared",
     "sharedBy": "Shared by"
+  },
+  "community": {
+    "title": "Community",
+    "selectOrg": "Select an organization to view its community",
+    "noOrg": "Join or create an organization to access the community.",
+    "general": "General",
+    "feedback": "Feedback",
+    "ideas": "Ideas",
+    "allThreads": "All",
+    "threads": "Threads",
+    "noThreads": "No discussions yet. Start a new thread!",
+    "newThread": "New Thread",
+    "threadTitle": "Thread Title",
+    "threadTitlePlaceholder": "What do you want to discuss?",
+    "category": "Category",
+    "firstPost": "Your message",
+    "firstPostPlaceholder": "Share your thoughts, questions, or ideas...",
+    "createThread": "Post Thread",
+    "creating": "Posting...",
+    "reply": "Reply",
+    "replyPlaceholder": "Write a reply...",
+    "postReply": "Post Reply",
+    "posting": "Posting...",
+    "deleteThread": "Delete Thread",
+    "posts": "replies",
+    "moderating": "Checking content...",
+    "moderationFailed": "Your message was not approved: ",
+    "backToThreads": "Back to threads",
+    "by": "by",
+    "pinned": "Pinned"
   },
   "intensity": {
     "low": "Low",

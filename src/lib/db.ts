@@ -1,5 +1,5 @@
 import pool, { initSchema } from "./pg";
-import { User, TrainingProgram, TrainingLogEntry, Organization, OrgMember, OrgInvitation } from "./types";
+import { User, TrainingProgram, TrainingLogEntry, Organization, OrgMember, OrgInvitation, CommunityThread, CommunityPost, ThreadCategory } from "./types";
 import { encrypt, decrypt } from "./crypto";
 
 // Initialize schema on first import
@@ -368,6 +368,87 @@ export async function getOrgSharedPrograms(orgId: string): Promise<TrainingProgr
   return rows.map(rowToProgram);
 }
 
+// Community Threads
+export async function createThread(thread: CommunityThread): Promise<CommunityThread> {
+  await ready();
+  await pool.query(
+    `INSERT INTO community_threads (id, org_id, category, title, author_id, pinned, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+    [thread.id, thread.orgId, thread.category, thread.title, thread.authorId, thread.pinned, thread.createdAt, thread.updatedAt]
+  );
+  return thread;
+}
+
+export async function getOrgThreads(orgId: string, category?: ThreadCategory): Promise<CommunityThread[]> {
+  await ready();
+  const query = category
+    ? `SELECT t.*, u.name as author_name,
+         (SELECT COUNT(*) FROM community_posts p WHERE p.thread_id = t.id) as post_count
+       FROM community_threads t JOIN users u ON u.id = t.author_id
+       WHERE t.org_id = $1 AND t.category = $2
+       ORDER BY t.pinned DESC, t.updated_at DESC`
+    : `SELECT t.*, u.name as author_name,
+         (SELECT COUNT(*) FROM community_posts p WHERE p.thread_id = t.id) as post_count
+       FROM community_threads t JOIN users u ON u.id = t.author_id
+       WHERE t.org_id = $1
+       ORDER BY t.pinned DESC, t.updated_at DESC`;
+  const params = category ? [orgId, category] : [orgId];
+  const { rows } = await pool.query(query, params);
+  return rows.map(rowToThread);
+}
+
+export async function getThread(id: string): Promise<CommunityThread | undefined> {
+  await ready();
+  const { rows } = await pool.query(
+    `SELECT t.*, u.name as author_name,
+       (SELECT COUNT(*) FROM community_posts p WHERE p.thread_id = t.id) as post_count
+     FROM community_threads t JOIN users u ON u.id = t.author_id
+     WHERE t.id = $1`,
+    [id]
+  );
+  return rows[0] ? rowToThread(rows[0]) : undefined;
+}
+
+export async function deleteThread(id: string): Promise<boolean> {
+  await ready();
+  const result = await pool.query("DELETE FROM community_threads WHERE id = $1", [id]);
+  return (result.rowCount ?? 0) > 0;
+}
+
+// Community Posts
+export async function createPost(post: CommunityPost): Promise<CommunityPost> {
+  await ready();
+  await pool.query(
+    `INSERT INTO community_posts (id, thread_id, author_id, content, created_at)
+     VALUES ($1, $2, $3, $4, $5)`,
+    [post.id, post.threadId, post.authorId, post.content, post.createdAt]
+  );
+  // Update thread's updated_at
+  await pool.query(
+    `UPDATE community_threads SET updated_at = $2 WHERE id = $1`,
+    [post.threadId, post.createdAt]
+  );
+  return post;
+}
+
+export async function getThreadPosts(threadId: string): Promise<CommunityPost[]> {
+  await ready();
+  const { rows } = await pool.query(
+    `SELECT p.*, u.name as author_name
+     FROM community_posts p JOIN users u ON u.id = p.author_id
+     WHERE p.thread_id = $1
+     ORDER BY p.created_at ASC`,
+    [threadId]
+  );
+  return rows.map(rowToPost);
+}
+
+export async function deletePost(id: string): Promise<boolean> {
+  await ready();
+  const result = await pool.query("DELETE FROM community_posts WHERE id = $1", [id]);
+  return (result.rowCount ?? 0) > 0;
+}
+
 // Row mappers
 function decryptApiKey(raw: unknown): string | null {
   if (!raw || typeof raw !== "string") return null;
@@ -454,5 +535,31 @@ function rowToInvitation(row: Record<string, unknown>): OrgInvitation {
     status: row.status as OrgInvitation["status"],
     createdAt: row.created_at as string,
     orgName: row.org_name as string | undefined,
+  };
+}
+
+function rowToThread(row: Record<string, unknown>): CommunityThread {
+  return {
+    id: row.id as string,
+    orgId: row.org_id as string,
+    category: row.category as ThreadCategory,
+    title: row.title as string,
+    authorId: row.author_id as string,
+    authorName: row.author_name as string | undefined,
+    pinned: row.pinned as boolean,
+    postCount: Number(row.post_count || 0),
+    createdAt: row.created_at as string,
+    updatedAt: row.updated_at as string,
+  };
+}
+
+function rowToPost(row: Record<string, unknown>): CommunityPost {
+  return {
+    id: row.id as string,
+    threadId: row.thread_id as string,
+    authorId: row.author_id as string,
+    authorName: row.author_name as string | undefined,
+    content: row.content as string,
+    createdAt: row.created_at as string,
   };
 }

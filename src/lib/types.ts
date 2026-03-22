@@ -75,3 +75,27 @@ export interface OrgInvitation {
   createdAt: string;
   orgName?: string;
 }
+
+export type ThreadCategory = "general" | "feedback" | "ideas";
+
+export interface CommunityThread {
+  id: string;
+  orgId: string;
+  category: ThreadCategory;
+  title: string;
+  authorId: string;
+  authorName?: string;
+  pinned: boolean;
+  postCount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CommunityPost {
+  id: string;
+  threadId: string;
+  authorId: string;
+  authorName?: string;
+  content: string;
+  createdAt: string;
+}

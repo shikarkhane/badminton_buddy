@@ -23,7 +23,8 @@
     "create": "创建课程",
     "timeline": "训练记录",
     "settings": "设置",
-    "organization": "组织"
+    "organization": "组织",
+    "community": "社区"
   },
   "landing": {
     "heroTitle": "提升您的羽毛球水平",
@@ -174,6 +175,36 @@
     "unshare": "停止共享",
     "sharedBadge": "已共享",
     "sharedBy": "共享者"
+  },
+  "community": {
+    "title": "社区",
+    "selectOrg": "选择一个组织查看其社区",
+    "noOrg": "加入或创建一个组织以访问社区。",
+    "general": "综合讨论",
+    "feedback": "反馈",
+    "ideas": "建议",
+    "allThreads": "全部",
+    "threads": "讨论",
+    "noThreads": "还没有讨论。发起一个新话题吧！",
+    "newThread": "新话题",
+    "threadTitle": "话题标题",
+    "threadTitlePlaceholder": "你想讨论什么？",
+    "category": "分类",
+    "firstPost": "您的消息",
+    "firstPostPlaceholder": "分享你的想法、问题或建议...",
+    "createThread": "发布话题",
+    "creating": "发布中...",
+    "reply": "回复",
+    "replyPlaceholder": "写一条回复...",
+    "postReply": "发布回复",
+    "posting": "发布中...",
+    "deleteThread": "删除话题",
+    "posts": "条回复",
+    "moderating": "正在审核内容...",
+    "moderationFailed": "您的消息未通过审核：",
+    "backToThreads": "返回话题列表",
+    "by": "作者",
+    "pinned": "置顶"
   },
   "intensity": {
     "low": "低",
