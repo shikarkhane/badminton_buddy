@@ -44,6 +44,7 @@
   },
   "programs": {
     "title": "Mis Programas de Entrenamiento",
+    "createNew": "Nuevo Programa",
     "empty": "Aún no hay programas. ¡Crea tu primer programa de entrenamiento!",
     "guestWarning": "Estás usando Shuttle Lab como invitado. Tus programas guardados se perderán si no inicias sesión. Inicia sesión con Google para conservar tus datos.",
     "searchPlaceholder": "Buscar por título, tema o intensidad...",

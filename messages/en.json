@@ -44,6 +44,7 @@
   },
   "programs": {
     "title": "My Training Programs",
+    "createNew": "New Program",
     "empty": "No programs yet. Create your first training program!",
     "guestWarning": "You're using Shuttle Lab as a guest. Your saved programs will be lost if you don't sign in. Sign in with Google to keep your data.",
     "searchPlaceholder": "Search by title, theme, or intensity...",

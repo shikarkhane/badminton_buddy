@@ -44,6 +44,7 @@
   },
   "programs": {
     "title": "我的训练课程",
+    "createNew": "新建课程",
     "empty": "还没有课程。创建您的第一个训练课程吧！",
     "guestWarning": "您正在以访客身份使用Shuttle Lab。如果不登录，您保存的课程将会丢失。请使用Google登录以保留您的数据。",
     "searchPlaceholder": "按标题、主题或强度搜索...",
