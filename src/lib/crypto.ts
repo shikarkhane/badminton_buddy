@@ -1,4 +1,4 @@
-import { randomBytes, createCipheriv, createDecipheriv } from "crypto";
+import { randomBytes, createCipheriv, createDecipheriv, scryptSync } from "crypto";
 
 const ALGORITHM = "aes-256-gcm";
 const IV_LENGTH = 12;
@@ -33,4 +33,17 @@ export function decrypt(encoded: string): string {
   const decipher = createDecipheriv(ALGORITHM, getKey(), iv);
   decipher.setAuthTag(tag);
   return decipher.update(ciphertext) + decipher.final("utf8");
+}
+
+export function hashPassword(password: string): string {
+  const salt = randomBytes(16).toString("hex");
+  const hash = scryptSync(password, salt, 64).toString("hex");
+  return `${salt}:${hash}`;
+}
+
+export function verifyPassword(password: string, stored: string): boolean {
+  const [salt, hash] = stored.split(":");
+  if (!salt || !hash) return false;
+  const test = scryptSync(password, salt, 64).toString("hex");
+  return hash === test;
 }

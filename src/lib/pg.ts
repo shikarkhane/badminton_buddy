@@ -145,6 +145,8 @@ export async function initSchema() {
     );
 
     CREATE INDEX IF NOT EXISTS idx_ai_usage_user ON ai_usage(user_id, used_at);
+
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT;
   `);
 
   schemaInitialized = true;

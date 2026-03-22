@@ -22,11 +22,12 @@ export async function loginGuest(): Promise<{ user: User }> {
 
 export async function loginGoogle(
   email: string,
+  password: string,
   name: string
 ): Promise<{ user: User }> {
   return fetchJson("/api/auth/login", {
     method: "POST",
-    body: JSON.stringify({ type: "google", email, name }),
+    body: JSON.stringify({ type: "google", email, password, name }),
   });
 }
 

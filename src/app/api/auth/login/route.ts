@@ -1,17 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
-import { loginWithGoogle, createGuestUser, getSessionCookieName } from "@/lib/auth";
+import { loginWithEmail, createGuestUser, getSessionCookieName } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { type, email, name } = body;
+  const { type, email, password, name } = body;
 
-  let user;
   if (type === "google" && email) {
-    user = await loginWithGoogle(email, name || email.split("@")[0]);
-  } else {
-    user = await createGuestUser();
+    if (!password) {
+      return NextResponse.json({ error: "Password is required" }, { status: 400 });
+    }
+    const result = await loginWithEmail(email, password, name || email.split("@")[0]);
+    if ("error" in result) {
+      return NextResponse.json({ error: result.error }, { status: 401 });
+    }
+
+    const response = NextResponse.json({ user: result.user });
+    response.cookies.set(getSessionCookieName(), result.user.id, {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+    return response;
   }
 
+  // Guest login
+  const user = await createGuestUser();
   const response = NextResponse.json({ user });
   response.cookies.set(getSessionCookieName(), user.id, {
     httpOnly: true,
@@ -19,6 +33,5 @@ export async function POST(request: NextRequest) {
     path: "/",
     maxAge: 60 * 60 * 24 * 7,
   });
-
   return response;
 }

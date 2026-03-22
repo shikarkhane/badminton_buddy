@@ -30,7 +30,7 @@ export default function CreateProgram() {
   const t = useTranslations();
   const router = useRouter();
   const { user, publicCreditsRemaining, refreshUser } = useAuth();
-  const [tab, setTab] = useState<"ai" | "text" | "custom">("ai");
+  const [tab, setTab] = useState<"ai" | "text" | "custom">("text");
 
   // AI form state
   const [theme, setTheme] = useState("");
@@ -54,10 +54,6 @@ export default function CreateProgram() {
   ]);
 
   const handleGenerate = async () => {
-    if (!user?.openaiApiKey) {
-      setError(t("create.noApiKey"));
-      return;
-    }
     setGenerating(true);
     setError("");
     try {
@@ -101,10 +97,6 @@ export default function CreateProgram() {
   };
 
   const handleConvertText = async () => {
-    if (!user?.openaiApiKey) {
-      setError(t("create.noApiKey"));
-      return;
-    }
     setConverting(true);
     setError("");
     try {
@@ -186,16 +178,6 @@ export default function CreateProgram() {
       {/* Tabs */}
       <div className="flex flex-wrap gap-2 mb-6">
         <button
-          onClick={() => setTab("ai")}
-          className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition text-sm sm:text-base ${
-            tab === "ai"
-              ? "bg-emerald-600 text-white"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-          }`}
-        >
-          {t("create.aiTab")}
-        </button>
-        <button
           onClick={() => setTab("text")}
           className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition text-sm sm:text-base ${
             tab === "text"
@@ -204,6 +186,16 @@ export default function CreateProgram() {
           }`}
         >
           {t("create.textTab")}
+        </button>
+        <button
+          onClick={() => setTab("ai")}
+          className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition text-sm sm:text-base ${
+            tab === "ai"
+              ? "bg-emerald-600 text-white"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+          }`}
+        >
+          {t("create.aiTab")}
         </button>
         <button
           onClick={() => setTab("custom")}

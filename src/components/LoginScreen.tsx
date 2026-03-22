@@ -10,12 +10,21 @@ export default function LoginScreen() {
   const { loginAsGuest, loginWithGoogle } = useAuth();
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [error, setError] = useState("");
 
-  const handleGoogleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      await loginWithGoogle(email, name || email.split("@")[0]);
+    setError("");
+    if (!email || !password) {
+      setError("Email and password are required");
+      return;
+    }
+    try {
+      await loginWithGoogle(email, password, name || email.split("@")[0]);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Login failed");
     }
   };
 
@@ -77,15 +86,28 @@ export default function LoginScreen() {
               </button>
             </>
           ) : (
-            <form onSubmit={handleGoogleLogin} className="space-y-4">
+            <form onSubmit={handleLogin} className="space-y-4">
               <p className="text-sm text-gray-500 text-center">
-                Enter your Gmail to sign in
+                Sign in or create an account
               </p>
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-sm">
+                  {error}
+                </div>
+              )}
               <input
                 type="email"
-                placeholder="your@gmail.com"
+                placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                required
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 required
               />
@@ -104,7 +126,7 @@ export default function LoginScreen() {
               </button>
               <button
                 type="button"
-                onClick={() => setShowEmailForm(false)}
+                onClick={() => { setShowEmailForm(false); setError(""); }}
                 className="w-full text-gray-500 hover:text-gray-700 text-sm"
               >
                 {t("common.back")}

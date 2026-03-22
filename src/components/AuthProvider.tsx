@@ -16,7 +16,7 @@ interface AuthContextType {
   loading: boolean;
   publicCreditsRemaining: number | null;
   loginAsGuest: () => Promise<void>;
-  loginWithGoogle: (email: string, name: string) => Promise<void>;
+  loginWithGoogle: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -58,8 +58,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
   };
 
-  const loginWithGoogleHandler = async (email: string, name: string) => {
-    const data = await loginGoogle(email, name);
+  const loginWithGoogleHandler = async (email: string, password: string, name: string) => {
+    const data = await loginGoogle(email, password, name);
     setUser(data.user);
   };
 

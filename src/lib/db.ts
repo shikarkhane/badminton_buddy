@@ -1,6 +1,6 @@
 import pool, { initSchema } from "./pg";
 import { User, TrainingProgram, TrainingLogEntry, Organization, OrgMember, OrgInvitation, CommunityThread, CommunityPost, ThreadCategory } from "./types";
-import { encrypt, decrypt } from "./crypto";
+import { encrypt, decrypt, hashPassword } from "./crypto";
 
 // Initialize schema on first import
 const schemaReady = initSchema();
@@ -26,11 +26,12 @@ export async function getUserByEmail(
   return rows[0] ? rowToUser(rows[0]) : undefined;
 }
 
-export async function createUser(user: User): Promise<User> {
+export async function createUser(user: User, password?: string): Promise<User> {
   await ready();
+  const pwHash = password ? hashPassword(password) : null;
   await pool.query(
-    `INSERT INTO users (id, email, name, is_guest, openai_api_key, locale, created_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+    `INSERT INTO users (id, email, name, is_guest, openai_api_key, locale, created_at, password_hash)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
     [
       user.id,
       user.email,
@@ -39,9 +40,45 @@ export async function createUser(user: User): Promise<User> {
       user.openaiApiKey ? encrypt(user.openaiApiKey) : null,
       user.locale,
       user.createdAt,
+      pwHash,
     ]
   );
   return user;
+}
+
+export async function setUserPassword(id: string, password: string): Promise<void> {
+  await ready();
+  const pwHash = hashPassword(password);
+  await pool.query("UPDATE users SET password_hash = $2 WHERE id = $1", [id, pwHash]);
+}
+
+export async function getUserPasswordHash(id: string): Promise<string | null> {
+  await ready();
+  const { rows } = await pool.query("SELECT password_hash FROM users WHERE id = $1", [id]);
+  return rows[0]?.password_hash || null;
+}
+
+export async function getUserPasswordHashByEmail(email: string): Promise<{ id: string; passwordHash: string | null } | null> {
+  await ready();
+  const { rows } = await pool.query("SELECT id, password_hash FROM users WHERE email = $1", [email]);
+  if (!rows[0]) return null;
+  return { id: rows[0].id, passwordHash: rows[0].password_hash };
+}
+
+export async function countUserProgramsToday(userId: string): Promise<number> {
+  await ready();
+  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { rows } = await pool.query(
+    "SELECT COUNT(*)::int AS count FROM programs WHERE user_id = $1 AND created_at > $2",
+    [userId, cutoff]
+  );
+  return rows[0]?.count ?? 0;
+}
+
+export async function getAllUsers(): Promise<User[]> {
+  await ready();
+  const { rows } = await pool.query("SELECT * FROM users ORDER BY created_at DESC");
+  return rows.map(rowToUser);
 }
 
 export async function updateUser(
