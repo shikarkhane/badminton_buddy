@@ -182,10 +182,10 @@ export default function CreateProgram() {
       </h1>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-6">
         <button
           onClick={() => setTab("ai")}
-          className={`px-6 py-2 rounded-lg font-medium transition ${
+          className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition text-sm sm:text-base ${
             tab === "ai"
               ? "bg-emerald-600 text-white"
               : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -195,7 +195,7 @@ export default function CreateProgram() {
         </button>
         <button
           onClick={() => setTab("text")}
-          className={`px-6 py-2 rounded-lg font-medium transition ${
+          className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition text-sm sm:text-base ${
             tab === "text"
               ? "bg-emerald-600 text-white"
               : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -205,7 +205,7 @@ export default function CreateProgram() {
         </button>
         <button
           onClick={() => setTab("custom")}
-          className={`px-6 py-2 rounded-lg font-medium transition ${
+          className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition text-sm sm:text-base ${
             tab === "custom"
               ? "bg-emerald-600 text-white"
               : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -223,7 +223,7 @@ export default function CreateProgram() {
 
       {/* AI Tab */}
       {tab === "ai" && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -284,7 +284,7 @@ export default function CreateProgram() {
 
       {/* Text Tab */}
       {tab === "text" && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -315,9 +315,9 @@ export default function CreateProgram() {
 
       {/* Custom Tab */}
       {tab === "custom" && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
           <div className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   {t("create.programTitle")}
@@ -377,7 +377,7 @@ export default function CreateProgram() {
                   </button>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-3 mb-4">
+                <div className="grid sm:grid-cols-2 gap-3 mb-4">
                   <input
                     type="text"
                     placeholder={t("create.levelTitle")}
@@ -415,7 +415,7 @@ export default function CreateProgram() {
                         {t("create.removeExercise")}
                       </button>
                     </div>
-                    <div className="grid md:grid-cols-2 gap-2">
+                    <div className="grid sm:grid-cols-2 gap-2">
                       <input
                         placeholder={t("create.exerciseName")}
                         value={ex.name}
@@ -457,7 +457,7 @@ export default function CreateProgram() {
                       className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                       rows={2}
                     />
-                    <div className="grid md:grid-cols-2 gap-2">
+                    <div className="grid sm:grid-cols-2 gap-2">
                       <input
                         placeholder={t("create.exerciseReps")}
                         value={ex.reps || ""}

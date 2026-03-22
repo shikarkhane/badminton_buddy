@@ -19,7 +19,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-[calc(100vh-4rem)]">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-emerald-600 to-teal-700 text-white py-20 px-4">
+      <section className="bg-gradient-to-br from-emerald-600 to-teal-700 text-white py-12 sm:py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="flex justify-center mb-6">
             <ShuttleLabLogo className="h-20 w-20 text-white opacity-90" />
@@ -30,16 +30,16 @@ export default function LandingPage() {
           <p className="text-lg md:text-xl text-emerald-100 mb-8 max-w-2xl mx-auto">
             {t("heroSubtitle")}
           </p>
-          <div className="flex gap-4 justify-center flex-wrap">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
             <Link
               href="/create"
-              className="bg-white text-emerald-700 font-semibold px-8 py-3 rounded-lg hover:bg-emerald-50 transition text-lg"
+              className="w-full sm:w-auto text-center bg-white text-emerald-700 font-semibold px-8 py-3 rounded-lg hover:bg-emerald-50 transition text-lg"
             >
               {t("getStarted")}
             </Link>
             <Link
               href="/programs"
-              className="border-2 border-white text-white font-semibold px-8 py-3 rounded-lg hover:bg-white/10 transition text-lg"
+              className="w-full sm:w-auto text-center border-2 border-white text-white font-semibold px-8 py-3 rounded-lg hover:bg-white/10 transition text-lg"
             >
               {t("feature1Title")}
             </Link>
@@ -48,9 +48,9 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section className="py-16 px-4 bg-white">
+      <section className="py-10 sm:py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
             {features.map(({ key, icon }) => (
               <div
                 key={key}

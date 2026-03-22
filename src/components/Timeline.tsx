@@ -76,13 +76,13 @@ export default function Timeline() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-emerald-800">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-emerald-800">
           {t("timeline.title")}
         </h1>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition"
+          className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition sm:flex-shrink-0"
         >
           + {t("timeline.logSession")}
         </button>
@@ -113,7 +113,7 @@ export default function Timeline() {
 
       {/* Log Session Form */}
       {showForm && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-6">
           <h3 className="font-semibold text-gray-800 mb-4">
             {t("timeline.logSession")}
           </h3>
@@ -209,14 +209,14 @@ export default function Timeline() {
         </div>
       ) : (
         <div className="relative">
-          <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-emerald-200"></div>
-          <div className="space-y-6">
+          <div className="absolute left-4 sm:left-6 top-0 bottom-0 w-0.5 bg-emerald-200"></div>
+          <div className="space-y-4 sm:space-y-6">
             {log.map((entry) => (
-              <div key={entry.id} className="relative pl-14">
-                <div className="absolute left-4 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white shadow"></div>
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
+              <div key={entry.id} className="relative pl-10 sm:pl-14">
+                <div className="absolute left-2 sm:left-4 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white shadow"></div>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 sm:p-4">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
+                    <div className="min-w-0">
                       <h3 className="font-semibold text-gray-800">
                         {entry.programTitle}
                       </h3>
@@ -229,7 +229,7 @@ export default function Timeline() {
                         </p>
                       )}
                     </div>
-                    <span className="text-sm text-gray-400 whitespace-nowrap ml-4">
+                    <span className="text-sm text-gray-400 whitespace-nowrap sm:ml-4">
                       {new Date(entry.date).toLocaleDateString()}
                     </span>
                   </div>

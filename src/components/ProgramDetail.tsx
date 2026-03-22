@@ -77,17 +77,15 @@ export default function ProgramDetail({ programId }: { programId: string }) {
         &larr; {t("common.back")}
       </button>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">{program.title}</h1>
-            <div className="flex gap-3 mt-2 text-sm">
-              <span className="text-gray-500">{t("programs.theme")}: {program.theme}</span>
-              <span className={`px-2 py-0.5 rounded-full text-xs ${intensityColors[program.intensity]}`}>
-                {t(`intensity.${program.intensity}`)}
-              </span>
-              <span className="text-gray-500">{program.levels.length} {t("programs.levels")}</span>
-            </div>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-6">
+        <div className="mb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">{program.title}</h1>
+          <div className="flex flex-wrap gap-2 sm:gap-3 mt-2 text-sm">
+            <span className="text-gray-500">{t("programs.theme")}: {program.theme}</span>
+            <span className={`px-2 py-0.5 rounded-full text-xs ${intensityColors[program.intensity]}`}>
+              {t(`intensity.${program.intensity}`)}
+            </span>
+            <span className="text-gray-500">{program.levels.length} {t("programs.levels")}</span>
           </div>
         </div>
 
@@ -139,13 +137,13 @@ export default function ProgramDetail({ programId }: { programId: string }) {
         {/* Use Today section */}
         <div className="bg-emerald-50 rounded-lg p-4 mb-6">
           <h3 className="font-semibold text-emerald-800 mb-3">{t("common.useToday")}</h3>
-          <div className="flex flex-wrap gap-4 items-end">
-            <div>
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 sm:items-end">
+            <div className="w-full sm:w-auto">
               <label className="block text-sm text-gray-600 mb-1">{t("timeline.selectLevel")}</label>
               <select
                 value={logLevel}
                 onChange={(e) => setLogLevel(Number(e.target.value))}
-                className="border border-gray-300 rounded px-3 py-2"
+                className="w-full sm:w-auto border border-gray-300 rounded px-3 py-2"
               >
                 {program.levels.map((level) => (
                   <option key={level.level} value={level.level}>
@@ -154,7 +152,7 @@ export default function ProgramDetail({ programId }: { programId: string }) {
                 ))}
               </select>
             </div>
-            <div className="flex-1 min-w-[200px]">
+            <div className="flex-1 min-w-0">
               <label className="block text-sm text-gray-600 mb-1">{t("timeline.notes")}</label>
               <input
                 type="text"
@@ -167,7 +165,7 @@ export default function ProgramDetail({ programId }: { programId: string }) {
             <button
               onClick={handleUseToday}
               disabled={logging}
-              className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition disabled:opacity-50"
+              className="w-full sm:w-auto bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition disabled:opacity-50"
             >
               {logging ? t("common.loading") : t("common.useToday")}
             </button>

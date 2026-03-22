@@ -49,7 +49,7 @@ export default function Settings() {
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {t("settings.apiKeyLabel")}

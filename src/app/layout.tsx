@@ -21,7 +21,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} className="h-full antialiased">
-      <body className="min-h-full flex flex-col font-sans">
+      <body className="min-h-full flex flex-col font-sans overflow-x-hidden">
         <NextIntlClientProvider messages={messages}>
           <AuthProvider>
             <Navbar />

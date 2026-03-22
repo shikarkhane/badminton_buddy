@@ -189,8 +189,8 @@ export default function CommunityPage() {
           </div>
         )}
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
-          <div className="flex justify-between items-start mb-2">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
             <div>
               <span className={`text-xs px-2 py-0.5 rounded-full mr-2 ${categoryColor(viewingThread.category)}`}>
                 {t(`community.${viewingThread.category}`)}
@@ -207,7 +207,7 @@ export default function CommunityPage() {
               </button>
             )}
           </div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-1">{viewingThread.title}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1 break-words">{viewingThread.title}</h1>
           <p className="text-sm text-gray-400">
             {t("community.by")} {viewingThread.authorName} &middot; {new Date(viewingThread.createdAt).toLocaleDateString()}
           </p>
@@ -252,11 +252,11 @@ export default function CommunityPage() {
   // Thread list view
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-emerald-800">{t("community.title")}</h1>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-emerald-800">{t("community.title")}</h1>
         <button
           onClick={() => setShowNewThread(!showNewThread)}
-          className="bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-emerald-700 transition"
+          className="bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-emerald-700 transition sm:flex-shrink-0"
         >
           {showNewThread ? t("common.cancel") : t("community.newThread")}
         </button>
@@ -290,9 +290,9 @@ export default function CommunityPage() {
 
       {/* New thread form */}
       {showNewThread && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-6">
           <div className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   {t("community.threadTitle")}
@@ -344,12 +344,12 @@ export default function CommunityPage() {
       )}
 
       {/* Category tabs */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-6">
         {CATEGORIES.map((cat) => (
           <button
             key={cat}
             onClick={() => setActiveCategory(cat)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium transition ${
               activeCategory === cat
                 ? "bg-emerald-100 text-emerald-700"
                 : "bg-gray-100 text-gray-500 hover:bg-gray-200"
@@ -369,7 +369,7 @@ export default function CommunityPage() {
             <button
               key={thread.id}
               onClick={() => openThread(thread)}
-              className="w-full text-left bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition"
+              className="w-full text-left bg-white rounded-xl shadow-sm border border-gray-100 p-3 sm:p-4 hover:shadow-md transition"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">

@@ -193,11 +193,11 @@ export default function OrgPage() {
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
           <h2 className="font-semibold text-blue-800 mb-3">{t("org.myInvitations")}</h2>
           {myInvitations.map((inv) => (
-            <div key={inv.id} className="flex items-center justify-between py-2">
+            <div key={inv.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-2 gap-2">
               <span className="text-blue-700">
                 {t("org.invitedToOrg")} <strong>{inv.orgName}</strong>
               </span>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-shrink-0">
                 <button
                   onClick={() => handleRespondInvitation(inv.id, "accept")}
                   className="bg-emerald-600 text-white px-3 py-1 rounded text-sm hover:bg-emerald-700"
@@ -217,7 +217,7 @@ export default function OrgPage() {
       )}
 
       {/* Create or select org */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-6">
         {orgs.length > 0 && (
           <div className="mb-4">
             <div className="flex flex-wrap gap-2">
@@ -238,7 +238,7 @@ export default function OrgPage() {
           </div>
         )}
 
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <input
             type="text"
             value={newOrgName}
@@ -250,7 +250,7 @@ export default function OrgPage() {
           <button
             onClick={handleCreateOrg}
             disabled={creating || !newOrgName.trim()}
-            className="bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-emerald-700 transition disabled:opacity-50"
+            className="bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-emerald-700 transition disabled:opacity-50 sm:flex-shrink-0"
           >
             {t("org.createOrg")}
           </button>
@@ -259,9 +259,9 @@ export default function OrgPage() {
 
       {/* Selected org details */}
       {selectedOrg && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-800">{selectedOrg.name}</h2>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+          <div className="flex justify-between items-center mb-6 gap-2">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 truncate">{selectedOrg.name}</h2>
             {isOwner ? (
               <button
                 onClick={handleDeleteOrg}
@@ -280,7 +280,7 @@ export default function OrgPage() {
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-2 mb-6 border-b border-gray-200 pb-2">
+          <div className="flex flex-wrap gap-1 sm:gap-2 mb-6 border-b border-gray-200 pb-2">
             {(["members", "invitations", "programs"] as const).map((tab) => (
               <button
                 key={tab}
@@ -300,7 +300,7 @@ export default function OrgPage() {
           {activeTab === "members" && (
             <div>
               {/* Invite form */}
-              <div className="flex gap-2 mb-4">
+              <div className="flex flex-col sm:flex-row gap-2 mb-4">
                 <input
                   type="email"
                   value={inviteEmail}
@@ -312,7 +312,7 @@ export default function OrgPage() {
                 <button
                   onClick={handleInvite}
                   disabled={!inviteEmail.trim()}
-                  className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition disabled:opacity-50"
+                  className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition disabled:opacity-50 sm:flex-shrink-0"
                 >
                   {t("org.sendInvite")}
                 </button>
@@ -325,14 +325,14 @@ export default function OrgPage() {
                   {members.map((member) => (
                     <div
                       key={member.id}
-                      className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg"
+                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-2 px-3 bg-gray-50 rounded-lg gap-1 sm:gap-2"
                     >
-                      <div>
+                      <div className="min-w-0">
                         <span className="font-medium text-gray-800">
                           {member.userName}
                         </span>
                         {member.userEmail && (
-                          <span className="text-gray-400 text-sm ml-2">
+                          <span className="text-gray-400 text-sm ml-2 break-all">
                             {member.userEmail}
                           </span>
                         )}
@@ -349,7 +349,7 @@ export default function OrgPage() {
                       {isOwner && member.userId !== user?.id && (
                         <button
                           onClick={() => handleRemoveMember(member.userId)}
-                          className="text-red-400 hover:text-red-600 text-sm"
+                          className="text-red-400 hover:text-red-600 text-sm flex-shrink-0"
                         >
                           {t("org.removeMember")}
                         </button>
@@ -414,8 +414,8 @@ export default function OrgPage() {
                       key={program.id}
                       className="bg-gray-50 rounded-lg p-4"
                     >
-                      <div className="flex justify-between items-start">
-                        <div>
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                        <div className="min-w-0">
                           <h3 className="font-semibold text-gray-800">
                             {program.title}
                           </h3>
@@ -431,7 +431,7 @@ export default function OrgPage() {
                         </div>
                         <Link
                           href={`/programs/${program.id}`}
-                          className="text-emerald-600 hover:text-emerald-800 text-sm font-medium"
+                          className="text-emerald-600 hover:text-emerald-800 text-sm font-medium flex-shrink-0"
                         >
                           {t("common.viewDetails")}
                         </Link>

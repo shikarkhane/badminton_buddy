@@ -21,7 +21,7 @@ export default function OpenAIGuide() {
       <p className="text-gray-500 mb-8">{t("subtitle")}</p>
 
       {/* What is an API key */}
-      <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+      <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-3">
           {t("whatTitle")}
         </h2>
@@ -29,7 +29,7 @@ export default function OpenAIGuide() {
       </section>
 
       {/* Why do you need it */}
-      <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+      <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-3">
           {t("whyTitle")}
         </h2>
@@ -42,7 +42,7 @@ export default function OpenAIGuide() {
       </section>
 
       {/* Cost info */}
-      <section className="bg-emerald-50 rounded-xl border border-emerald-200 p-6 mb-6">
+      <section className="bg-emerald-50 rounded-xl border border-emerald-200 p-4 sm:p-6 mb-6">
         <h2 className="text-xl font-semibold text-emerald-800 mb-3">
           {t("costTitle")}
         </h2>
@@ -53,12 +53,12 @@ export default function OpenAIGuide() {
       </section>
 
       {/* Step by step */}
-      <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+      <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
           {t("stepsTitle")}
         </h2>
         <ol className="space-y-4">
-          <li className="flex gap-4">
+          <li className="flex gap-3 sm:gap-4">
             <span className="flex-shrink-0 w-8 h-8 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-bold text-sm">
               1
             </span>
@@ -67,7 +67,7 @@ export default function OpenAIGuide() {
               <p className="text-gray-600 text-sm mt-1">{t("step1Desc")}</p>
             </div>
           </li>
-          <li className="flex gap-4">
+          <li className="flex gap-3 sm:gap-4">
             <span className="flex-shrink-0 w-8 h-8 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-bold text-sm">
               2
             </span>
@@ -76,7 +76,7 @@ export default function OpenAIGuide() {
               <p className="text-gray-600 text-sm mt-1">{t("step2Desc")}</p>
             </div>
           </li>
-          <li className="flex gap-4">
+          <li className="flex gap-3 sm:gap-4">
             <span className="flex-shrink-0 w-8 h-8 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-bold text-sm">
               3
             </span>
@@ -85,7 +85,7 @@ export default function OpenAIGuide() {
               <p className="text-gray-600 text-sm mt-1">{t("step3Desc")}</p>
             </div>
           </li>
-          <li className="flex gap-4">
+          <li className="flex gap-3 sm:gap-4">
             <span className="flex-shrink-0 w-8 h-8 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-bold text-sm">
               4
             </span>
@@ -94,7 +94,7 @@ export default function OpenAIGuide() {
               <p className="text-gray-600 text-sm mt-1">{t("step4Desc")}</p>
             </div>
           </li>
-          <li className="flex gap-4">
+          <li className="flex gap-3 sm:gap-4">
             <span className="flex-shrink-0 w-8 h-8 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-bold text-sm">
               5
             </span>
@@ -107,7 +107,7 @@ export default function OpenAIGuide() {
       </section>
 
       {/* Safety */}
-      <section className="bg-amber-50 rounded-xl border border-amber-200 p-6 mb-6">
+      <section className="bg-amber-50 rounded-xl border border-amber-200 p-4 sm:p-6 mb-6">
         <h2 className="text-xl font-semibold text-amber-800 mb-3">
           {t("safetyTitle")}
         </h2>
