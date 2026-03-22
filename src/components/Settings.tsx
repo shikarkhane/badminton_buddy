@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "./AuthProvider";
-import { updateSettings } from "@/lib/api";
+import { updateSettings, updatePassword } from "@/lib/api";
 
 export default function Settings() {
   const t = useTranslations();
@@ -14,6 +14,43 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+
+  // Password change state
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [pwSaving, setPwSaving] = useState(false);
+  const [pwSaved, setPwSaved] = useState(false);
+  const [pwError, setPwError] = useState("");
+
+  const handlePasswordChange = async () => {
+    setPwError("");
+    setPwSaved(false);
+    if (!newPassword || newPassword.length < 4) {
+      setPwError("New password must be at least 4 characters");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPwError("Passwords do not match");
+      return;
+    }
+    setPwSaving(true);
+    try {
+      await updatePassword({
+        currentPassword: currentPassword || undefined,
+        newPassword,
+      });
+      setPwSaved(true);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setTimeout(() => setPwSaved(false), 3000);
+    } catch (err: unknown) {
+      setPwError(err instanceof Error ? err.message : "Failed to update password");
+    } finally {
+      setPwSaving(false);
+    }
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -117,6 +154,74 @@ export default function Settings() {
           </div>
         )}
       </div>
+
+      {/* Password Change */}
+      {!user?.isGuest && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 space-y-4 mt-6">
+          <h2 className="text-lg font-semibold text-gray-800">
+            {t("settings.changePassword")}
+          </h2>
+
+          {pwError && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              {pwError}
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t("settings.currentPassword")}
+            </label>
+            <input
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder={t("settings.currentPasswordPlaceholder")}
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t("settings.newPassword")}
+            </label>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder={t("settings.newPasswordPlaceholder")}
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t("settings.confirmPassword")}
+            </label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder={t("settings.confirmPasswordPlaceholder")}
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+          </div>
+
+          <button
+            onClick={handlePasswordChange}
+            disabled={pwSaving || !newPassword}
+            className="bg-emerald-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-emerald-700 transition disabled:opacity-50"
+          >
+            {pwSaving ? t("common.loading") : t("settings.updatePassword")}
+          </button>
+
+          {pwSaved && (
+            <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg">
+              {t("settings.passwordUpdated")}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

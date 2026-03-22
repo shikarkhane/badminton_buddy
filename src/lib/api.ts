@@ -53,6 +53,16 @@ export async function updateSettings(settings: {
   });
 }
 
+export async function updatePassword(data: {
+  currentPassword?: string;
+  newPassword: string;
+}): Promise<{ passwordUpdated: boolean }> {
+  return fetchJson("/api/auth/settings", {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
 // Programs
 export async function getPrograms(
   query?: string

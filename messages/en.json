@@ -116,7 +116,16 @@
     "publicCreditsNote": "Without a key, you get 10 free AI calls per day using our public credits.",
     "apiKeyGuideLink": "How do I get an API key?",
     "languageLabel": "Language",
-    "saved": "Settings saved!"
+    "saved": "Settings saved!",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "currentPasswordPlaceholder": "Enter current password (leave blank if not set)",
+    "newPassword": "New Password",
+    "newPasswordPlaceholder": "Enter new password",
+    "confirmPassword": "Confirm New Password",
+    "confirmPasswordPlaceholder": "Re-enter new password",
+    "updatePassword": "Update Password",
+    "passwordUpdated": "Password updated successfully!"
   },
   "guide": {
     "title": "How to Set Up Your OpenAI API Key",

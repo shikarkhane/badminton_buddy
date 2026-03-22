@@ -116,7 +116,16 @@
     "publicCreditsNote": "Sin clave, obtienes 10 llamadas de IA gratuitas por día usando nuestros créditos públicos.",
     "apiKeyGuideLink": "¿Cómo obtengo una clave API?",
     "languageLabel": "Idioma",
-    "saved": "¡Configuración guardada!"
+    "saved": "¡Configuración guardada!",
+    "changePassword": "Cambiar Contraseña",
+    "currentPassword": "Contraseña Actual",
+    "currentPasswordPlaceholder": "Ingresa la contraseña actual (dejar en blanco si no está configurada)",
+    "newPassword": "Nueva Contraseña",
+    "newPasswordPlaceholder": "Ingresa la nueva contraseña",
+    "confirmPassword": "Confirmar Nueva Contraseña",
+    "confirmPasswordPlaceholder": "Re-ingresa la nueva contraseña",
+    "updatePassword": "Actualizar Contraseña",
+    "passwordUpdated": "¡Contraseña actualizada exitosamente!"
   },
   "guide": {
     "title": "Cómo Configurar Tu Clave API de OpenAI",

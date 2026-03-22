@@ -116,7 +116,16 @@
     "publicCreditsNote": "没有密钥时，您每天可使用10次免费AI调用。",
     "apiKeyGuideLink": "如何获取API密钥？",
     "languageLabel": "语言",
-    "saved": "设置已保存！"
+    "saved": "设置已保存！",
+    "changePassword": "修改密码",
+    "currentPassword": "当前密码",
+    "currentPasswordPlaceholder": "输入当前密码（未设置则留空）",
+    "newPassword": "新密码",
+    "newPasswordPlaceholder": "输入新密码",
+    "confirmPassword": "确认新密码",
+    "confirmPasswordPlaceholder": "再次输入新密码",
+    "updatePassword": "更新密码",
+    "passwordUpdated": "密码更新成功！"
   },
   "guide": {
     "title": "如何设置您的OpenAI API密钥",
