@@ -142,6 +142,42 @@ export default function Timeline() {
             {t("timeline.logSession")}
           </h3>
           <div className="space-y-4">
+            {sessions.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t("timeline.selectSession")}
+                </label>
+                <select
+                  value={selectedSession}
+                  onChange={(e) => {
+                    const sessId = e.target.value;
+                    setSelectedSession(sessId);
+                    // Pre-fill program from session's default
+                    if (sessId) {
+                      const sess = sessions.find((s) => s.id === sessId);
+                      if (sess?.programId) {
+                        setSelectedProgram(sess.programId);
+                        setSelectedLevel(1);
+                      }
+                    }
+                  }}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                >
+                  <option value="">{t("timeline.noSession")}</option>
+                  {sessions.map((s) => {
+                    const days = s.recurrenceRule?.daysOfWeek
+                      ? s.recurrenceRule.daysOfWeek.map((d) => DAY_NAMES[d]).join(", ")
+                      : DAY_NAMES[s.dayOfWeek];
+                    return (
+                      <option key={s.id} value={s.id}>
+                        {s.name} ({days} {s.startTime})
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t("timeline.selectProgram")}
@@ -193,26 +229,6 @@ export default function Timeline() {
                 className="w-full border border-gray-300 rounded-lg px-4 py-3"
               />
             </div>
-
-            {sessions.length > 0 && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t("timeline.selectSession")}
-                </label>
-                <select
-                  value={selectedSession}
-                  onChange={(e) => setSelectedSession(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3"
-                >
-                  <option value="">{t("timeline.noSession")}</option>
-                  {sessions.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name} ({DAY_NAMES[s.dayOfWeek]} {s.startTime})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">

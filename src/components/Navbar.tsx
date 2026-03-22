@@ -67,6 +67,14 @@ export default function Navbar() {
                 >
                   {t("nav.timeline")}
                 </Link>
+                {actingAs.type === "org" && (
+                  <Link
+                    href="/sessions"
+                    className="hover:text-emerald-200 transition"
+                  >
+                    {t("nav.sessions")}
+                  </Link>
+                )}
                 <Link
                   href="/org"
                   className="hover:text-emerald-200 transition relative"
@@ -182,6 +190,15 @@ export default function Navbar() {
             >
               {t("nav.timeline")}
             </Link>
+            {actingAs.type === "org" && (
+              <Link
+                href="/sessions"
+                className="block py-2 hover:text-emerald-200"
+                onClick={() => setMenuOpen(false)}
+              >
+                {t("nav.sessions")}
+              </Link>
+            )}
             <Link
               href="/org"
               className="block py-2 hover:text-emerald-200"
