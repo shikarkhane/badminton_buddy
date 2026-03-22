@@ -137,6 +137,14 @@ export async function initSchema() {
     CREATE INDEX IF NOT EXISTS idx_threads_org ON community_threads(org_id);
     CREATE INDEX IF NOT EXISTS idx_threads_category ON community_threads(org_id, category);
     CREATE INDEX IF NOT EXISTS idx_posts_thread ON community_posts(thread_id);
+
+    CREATE TABLE IF NOT EXISTS ai_usage (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      used_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_ai_usage_user ON ai_usage(user_id, used_at);
   `);
 
   schemaInitialized = true;

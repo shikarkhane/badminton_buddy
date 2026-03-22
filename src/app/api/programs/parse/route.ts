@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { getCurrentUser } from "@/lib/auth";
+import { resolveOpenAIKey, trackPublicUsage, handleOpenAIError } from "@/lib/openai";
 
 function extractJson(text: string): string {
   const fenceMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/);
@@ -16,10 +17,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!user.openaiApiKey) {
+  const keyResult = await resolveOpenAIKey(user);
+  if ("error" in keyResult) {
     return NextResponse.json(
-      { error: "OpenAI API key not configured. Please add your key in Settings." },
-      { status: 400 }
+      { error: keyResult.error },
+      { status: keyResult.status }
     );
   }
 
@@ -73,7 +75,7 @@ Return ONLY valid JSON in this exact format (no markdown, no code fences):
 
   let openai: OpenAI;
   try {
-    openai = new OpenAI({ apiKey: user.openaiApiKey });
+    openai = new OpenAI({ apiKey: keyResult.apiKey });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Invalid API key format";
     return NextResponse.json({ error: `OpenAI setup failed: ${message}` }, { status: 400 });
@@ -112,27 +114,11 @@ Return ONLY valid JSON in this exact format (no markdown, no code fences):
       );
     }
 
+    await trackPublicUsage(user.id, keyResult.isPublic);
+
     return NextResponse.json({ program: parsed });
   } catch (error: unknown) {
-    if (error instanceof OpenAI.APIError) {
-      if (error.status === 401) {
-        return NextResponse.json(
-          { error: "Your OpenAI API key is invalid. Please check it in Settings." },
-          { status: 400 }
-        );
-      }
-      if (error.status === 429) {
-        return NextResponse.json(
-          { error: "OpenAI rate limit reached. Please wait a moment and try again." },
-          { status: 429 }
-        );
-      }
-      return NextResponse.json(
-        { error: `OpenAI error: ${error.message}` },
-        { status: error.status || 500 }
-      );
-    }
-    const message = error instanceof Error ? error.message : "Failed to parse program";
-    return NextResponse.json({ error: message }, { status: 500 });
+    const mapped = handleOpenAIError(error);
+    return NextResponse.json({ error: mapped.error }, { status: mapped.status });
   }
 }

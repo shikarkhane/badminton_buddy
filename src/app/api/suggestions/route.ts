@@ -2,6 +2,23 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { getCurrentUser } from "@/lib/auth";
 import { getRecentTrainingLog } from "@/lib/db";
+import { resolveOpenAIKey, trackPublicUsage } from "@/lib/openai";
+
+function ruleFallback(themes: string[]) {
+  const fallbackSuggestions: Record<string, string> = {
+    Footwork: "Net Play",
+    "Net Play": "Smash Power",
+    "Smash Power": "Defense Drills",
+    "Defense Drills": "Doubles Strategy",
+    "Doubles Strategy": "Footwork",
+  };
+  const lastTheme = themes[0];
+  const suggestion = fallbackSuggestions[lastTheme] || "Footwork Fundamentals";
+  return {
+    suggestion,
+    reasoning: `Based on your recent focus on ${themes.join(", ")}, we suggest working on ${suggestion} to build a well-rounded game.`,
+  };
+}
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -18,28 +35,14 @@ export async function GET() {
     });
   }
 
-  if (!user.openaiApiKey) {
-    // Fallback suggestion without AI
+  const keyResult = await resolveOpenAIKey(user);
+  if ("error" in keyResult) {
+    // No key available — use rule-based fallback (don't error on suggestions)
     const themes = recentSessions.map((s) => s.theme);
-    const fallbackSuggestions: Record<string, string> = {
-      Footwork: "Net Play",
-      "Net Play": "Smash Power",
-      "Smash Power": "Defense Drills",
-      "Defense Drills": "Doubles Strategy",
-      "Doubles Strategy": "Footwork",
-    };
-
-    const lastTheme = themes[0];
-    const suggestion =
-      fallbackSuggestions[lastTheme] || "Footwork Fundamentals";
-
-    return NextResponse.json({
-      suggestion,
-      reasoning: `Based on your recent focus on ${themes.join(", ")}, we suggest working on ${suggestion} to build a well-rounded game.`,
-    });
+    return NextResponse.json(ruleFallback(themes));
   }
 
-  const openai = new OpenAI({ apiKey: user.openaiApiKey });
+  const openai = new OpenAI({ apiKey: keyResult.apiKey });
 
   const sessionSummary = recentSessions
     .map(
@@ -81,12 +84,14 @@ export async function GET() {
     try {
       parsed = JSON.parse(jsonStr);
     } catch {
-      // If AI response isn't valid JSON, return a basic suggestion
       return NextResponse.json({
         suggestion: content.trim(),
         reasoning: "AI-generated suggestion",
       });
     }
+
+    await trackPublicUsage(user.id, keyResult.isPublic);
+
     return NextResponse.json(parsed);
   } catch (error: unknown) {
     // On OpenAI errors, fall back to rule-based suggestion

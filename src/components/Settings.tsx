@@ -8,7 +8,7 @@ import { updateSettings } from "@/lib/api";
 
 export default function Settings() {
   const t = useTranslations();
-  const { user, refreshUser } = useAuth();
+  const { user, refreshUser, publicCreditsRemaining } = useAuth();
   const [apiKey, setApiKey] = useState(user?.openaiApiKey || "");
   const [locale, setLocale] = useState(user?.locale || "en");
   const [saving, setSaving] = useState(false);
@@ -64,6 +64,22 @@ export default function Settings() {
           <p className="text-sm text-gray-400 mt-1">
             {t("settings.apiKeyHelp")}
           </p>
+          {/* Show public credits status */}
+          {user?.openaiApiKey ? (
+            <p className="text-sm text-emerald-600 mt-1">
+              {t("create.ownKeyActive")}
+            </p>
+          ) : publicCreditsRemaining !== null ? (
+            <p className={`text-sm mt-1 ${publicCreditsRemaining > 0 ? "text-blue-600" : "text-amber-600"}`}>
+              {publicCreditsRemaining > 0
+                ? t("create.publicCreditsInfo", { count: publicCreditsRemaining })
+                : t("create.noCreditsLeft")}
+            </p>
+          ) : (
+            <p className="text-sm text-gray-400 mt-1">
+              {t("settings.publicCreditsNote")}
+            </p>
+          )}
           <Link
             href="/guide"
             className="inline-block text-sm text-emerald-600 hover:text-emerald-800 mt-2 underline"

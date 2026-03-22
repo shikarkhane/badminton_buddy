@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser, getSessionCookieName } from "@/lib/auth";
 import { createUser, getUser } from "@/lib/db";
+import { getRemainingCredits } from "@/lib/openai";
 import { cookies } from "next/headers";
 
 export async function GET() {
@@ -18,9 +19,14 @@ export async function GET() {
         locale: "en",
         createdAt: new Date().toISOString(),
       });
-      return NextResponse.json({ user: restored });
+      const hasPublicKey = !!process.env.OPENAI_API_KEY;
+      const credits = hasPublicKey ? await getRemainingCredits(restored.id) : 0;
+      return NextResponse.json({ user: restored, publicCreditsRemaining: hasPublicKey ? credits : null });
     }
     return NextResponse.json({ user: null }, { status: 401 });
   }
-  return NextResponse.json({ user });
+
+  const hasPublicKey = !!process.env.OPENAI_API_KEY;
+  const credits = hasPublicKey && !user.openaiApiKey ? await getRemainingCredits(user.id) : null;
+  return NextResponse.json({ user, publicCreditsRemaining: credits });
 }

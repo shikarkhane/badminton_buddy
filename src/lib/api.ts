@@ -34,7 +34,7 @@ export async function logout(): Promise<void> {
   await fetchJson("/api/auth/logout", { method: "POST" });
 }
 
-export async function getMe(): Promise<{ user: User | null }> {
+export async function getMe(): Promise<{ user: User | null; publicCreditsRemaining?: number | null }> {
   try {
     return await fetchJson("/api/auth/me");
   } catch {

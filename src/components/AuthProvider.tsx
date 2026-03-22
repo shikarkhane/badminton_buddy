@@ -14,6 +14,7 @@ import { getMe, loginGuest, loginGoogle, logout as apiLogout } from "@/lib/api";
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  publicCreditsRemaining: number | null;
   loginAsGuest: () => Promise<void>;
   loginWithGoogle: (email: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -23,6 +24,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  publicCreditsRemaining: null,
   loginAsGuest: async () => {},
   loginWithGoogle: async () => {},
   logout: async () => {},
@@ -32,13 +34,16 @@ const AuthContext = createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [publicCreditsRemaining, setPublicCreditsRemaining] = useState<number | null>(null);
 
   const refreshUser = useCallback(async () => {
     try {
-      const { user } = await getMe();
-      setUser(user);
+      const data = await getMe();
+      setUser(data.user);
+      setPublicCreditsRemaining(data.publicCreditsRemaining ?? null);
     } catch {
       setUser(null);
+      setPublicCreditsRemaining(null);
     } finally {
       setLoading(false);
     }
@@ -49,18 +54,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [refreshUser]);
 
   const loginAsGuest = async () => {
-    const { user } = await loginGuest();
-    setUser(user);
+    const data = await loginGuest();
+    setUser(data.user);
   };
 
   const loginWithGoogleHandler = async (email: string, name: string) => {
-    const { user } = await loginGoogle(email, name);
-    setUser(user);
+    const data = await loginGoogle(email, name);
+    setUser(data.user);
   };
 
   const logout = async () => {
     await apiLogout();
     setUser(null);
+    setPublicCreditsRemaining(null);
   };
 
   return (
@@ -68,6 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         loading,
+        publicCreditsRemaining,
         loginAsGuest,
         loginWithGoogle: loginWithGoogleHandler,
         logout,

@@ -29,7 +29,7 @@ const defaultLevel = (num: number): TrainingLevel => ({
 export default function CreateProgram() {
   const t = useTranslations();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, publicCreditsRemaining, refreshUser } = useAuth();
   const [tab, setTab] = useState<"ai" | "text" | "custom">("ai");
 
   // AI form state
@@ -74,6 +74,7 @@ export default function CreateProgram() {
         isCustom: false,
         isAIGenerated: true,
       });
+      refreshUser(); // update credits count
       router.push("/programs");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Generation failed");
@@ -116,6 +117,7 @@ export default function CreateProgram() {
         isCustom: true,
         isAIGenerated: false,
       });
+      refreshUser(); // update credits count
       router.push("/programs");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Conversion failed");
@@ -218,6 +220,19 @@ export default function CreateProgram() {
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
           {error}
+        </div>
+      )}
+
+      {/* Credits info for AI tabs */}
+      {(tab === "ai" || tab === "text") && !user?.openaiApiKey && publicCreditsRemaining !== null && (
+        <div className={`px-4 py-3 rounded-lg mb-4 text-sm ${
+          publicCreditsRemaining > 0
+            ? "bg-blue-50 border border-blue-200 text-blue-700"
+            : "bg-amber-50 border border-amber-200 text-amber-700"
+        }`}>
+          {publicCreditsRemaining > 0
+            ? t("create.publicCreditsInfo", { count: publicCreditsRemaining })
+            : t("create.noCreditsLeft")}
         </div>
       )}
 

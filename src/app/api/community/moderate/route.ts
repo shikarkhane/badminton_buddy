@@ -1,17 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { getCurrentUser } from "@/lib/auth";
+import { resolveOpenAIKey, trackPublicUsage } from "@/lib/openai";
 
 export async function POST(request: NextRequest) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  if (!user.openaiApiKey) {
-    // If user has no key, skip AI moderation — do basic check only
-    const { content } = await request.json();
-    const basic = basicCheck(content);
-    return NextResponse.json(basic);
-  }
 
   const { content } = await request.json();
   if (!content || typeof content !== "string") {
@@ -22,9 +16,16 @@ export async function POST(request: NextRequest) {
   const basic = basicCheck(content);
   if (!basic.approved) return NextResponse.json(basic);
 
+  // Try to get an API key for AI moderation
+  const keyResult = await resolveOpenAIKey(user);
+  if ("error" in keyResult) {
+    // No key available — pass with basic check only
+    return NextResponse.json({ approved: true });
+  }
+
   // AI moderation
   try {
-    const openai = new OpenAI({ apiKey: user.openaiApiKey });
+    const openai = new OpenAI({ apiKey: keyResult.apiKey });
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
@@ -57,6 +58,7 @@ Respond with ONLY valid JSON: {"approved": true} or {"approved": false, "reason"
     if (result) {
       try {
         const parsed = JSON.parse(result.replace(/```json?\s*/g, "").replace(/```/g, "").trim());
+        await trackPublicUsage(user.id, keyResult.isPublic);
         return NextResponse.json(parsed);
       } catch {
         // If AI response can't be parsed, approve (fail open)

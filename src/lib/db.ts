@@ -449,6 +449,26 @@ export async function deletePost(id: string): Promise<boolean> {
   return (result.rowCount ?? 0) > 0;
 }
 
+// AI usage tracking (for public credits rate limiting)
+export async function countRecentAiUsage(userId: string, hours: number = 24): Promise<number> {
+  await ready();
+  const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
+  const { rows } = await pool.query(
+    "SELECT COUNT(*)::int AS count FROM ai_usage WHERE user_id = $1 AND used_at > $2",
+    [userId, cutoff]
+  );
+  return rows[0]?.count ?? 0;
+}
+
+export async function recordAiUsage(userId: string): Promise<void> {
+  await ready();
+  const id = crypto.randomUUID();
+  await pool.query(
+    "INSERT INTO ai_usage (id, user_id, used_at) VALUES ($1, $2, $3)",
+    [id, userId, new Date().toISOString()]
+  );
+}
+
 // Row mappers
 function decryptApiKey(raw: unknown): string | null {
   if (!raw || typeof raw !== "string") return null;
