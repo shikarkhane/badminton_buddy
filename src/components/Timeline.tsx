@@ -2,20 +2,26 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
-import { TrainingLogEntry, TrainingProgram } from "@/lib/types";
+import { TrainingLogEntry, TrainingProgram, TrainingSession } from "@/lib/types";
 import {
   getTrainingLog,
   getPrograms,
   logTrainingSession,
   getSuggestion,
+  getUserSessions,
 } from "@/lib/api";
+import SessionManager from "./SessionManager";
+
+const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function Timeline() {
   const t = useTranslations();
   const [log, setLog] = useState<TrainingLogEntry[]>([]);
   const [programs, setPrograms] = useState<TrainingProgram[]>([]);
+  const [sessions, setSessions] = useState<TrainingSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [showSessions, setShowSessions] = useState(false);
   const [suggestion, setSuggestion] = useState<{
     suggestion: string | null;
     reasoning?: string;
@@ -24,6 +30,7 @@ export default function Timeline() {
   // Form state
   const [selectedProgram, setSelectedProgram] = useState("");
   const [selectedLevel, setSelectedLevel] = useState(1);
+  const [selectedSession, setSelectedSession] = useState("");
   const [sessionDate, setSessionDate] = useState(
     new Date().toISOString().split("T")[0]
   );
@@ -32,13 +39,15 @@ export default function Timeline() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [logRes, progRes, sugRes] = await Promise.all([
+      const [logRes, progRes, sugRes, sessRes] = await Promise.all([
         getTrainingLog(),
         getPrograms(),
         getSuggestion(),
+        getUserSessions(),
       ]);
       setLog(logRes.log);
       setPrograms(progRes.programs);
+      setSessions(sessRes.sessions);
       setSuggestion(sugRes);
     } catch {
       // ignore
@@ -62,10 +71,12 @@ export default function Timeline() {
       levelUsed: selectedLevel,
       notes: sessionNotes,
       date: sessionDate,
+      sessionId: selectedSession || undefined,
     });
 
     setShowForm(false);
     setSessionNotes("");
+    setSelectedSession("");
     loadData();
   };
 
@@ -170,6 +181,26 @@ export default function Timeline() {
               />
             </div>
 
+            {sessions.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t("timeline.selectSession")}
+                </label>
+                <select
+                  value={selectedSession}
+                  onChange={(e) => setSelectedSession(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                >
+                  <option value="">{t("timeline.noSession")}</option>
+                  {sessions.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name} ({DAY_NAMES[s.dayOfWeek]} {s.startTime})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t("timeline.notes")}
@@ -202,6 +233,22 @@ export default function Timeline() {
         </div>
       )}
 
+      {/* My Sessions */}
+      <div className="mb-6">
+        <button
+          onClick={() => setShowSessions(!showSessions)}
+          className="flex items-center gap-2 text-emerald-700 font-semibold hover:text-emerald-900 transition mb-3"
+        >
+          <span className="text-sm">{showSessions ? "▼" : "▶"}</span>
+          {t("sessions.title")}
+        </button>
+        {showSessions && (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+            <SessionManager programs={programs} />
+          </div>
+        )}
+      </div>
+
       {/* Timeline */}
       {log.length === 0 ? (
         <div className="text-center py-12">
@@ -222,6 +269,9 @@ export default function Timeline() {
                       </h3>
                       <p className="text-sm text-gray-500">
                         {entry.theme} &middot; Level {entry.levelUsed}
+                        {entry.sessionName && (
+                          <span> &middot; {entry.sessionName}</span>
+                        )}
                       </p>
                       {entry.notes && (
                         <p className="text-gray-600 mt-2 text-sm">

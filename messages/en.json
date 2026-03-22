@@ -106,7 +106,24 @@
     "notesPlaceholder": "How was your session? Any improvements noticed?",
     "suggestion": "Suggested Next Theme",
     "suggestionDesc": "Based on your last 3 sessions, we recommend:",
-    "noSuggestion": "Complete at least 3 sessions to get AI suggestions."
+    "noSuggestion": "Complete at least 3 sessions to get AI suggestions.",
+    "selectSession": "Training Session (optional)",
+    "noSession": "-- No session --"
+  },
+  "sessions": {
+    "title": "My Sessions",
+    "addSession": "Add Session",
+    "sessionName": "Session Name",
+    "namePlaceholder": "e.g., Tuesday Evening Practice",
+    "dayOfWeek": "Day of Week",
+    "startTime": "Start Time",
+    "assignProgram": "Assign Program",
+    "noProgram": "No program assigned",
+    "noProgramAssigned": "No program assigned",
+    "empty": "No sessions yet. Add your weekly training sessions!",
+    "viewHistory": "History",
+    "hideHistory": "Hide History",
+    "noHistory": "No training logged for this session yet."
   },
   "settings": {
     "title": "Settings",
@@ -193,7 +210,8 @@
     "shareWithOrg": "Share with Organization",
     "unshare": "Stop Sharing",
     "sharedBadge": "Shared",
-    "sharedBy": "Shared by"
+    "sharedBy": "Shared by",
+    "sessions": "Sessions"
   },
   "community": {
     "title": "Community",

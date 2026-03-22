@@ -30,6 +30,7 @@ export async function POST(request: NextRequest) {
     levelUsed: body.levelUsed,
     notes: body.notes || "",
     date: body.date || new Date().toISOString().split("T")[0],
+    sessionId: body.sessionId || null,
     createdAt: new Date().toISOString(),
   });
 

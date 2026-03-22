@@ -155,6 +155,22 @@ export async function initSchema() {
     );
 
     CREATE INDEX IF NOT EXISTS idx_login_events_user ON login_events(user_id, logged_in_at);
+
+    CREATE TABLE IF NOT EXISTS training_sessions (
+      id TEXT PRIMARY KEY,
+      org_id TEXT REFERENCES organizations(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      day_of_week INTEGER NOT NULL,
+      start_time TEXT NOT NULL DEFAULT '18:00',
+      program_id TEXT REFERENCES programs(id) ON DELETE SET NULL,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_training_sessions_org ON training_sessions(org_id);
+    CREATE INDEX IF NOT EXISTS idx_training_sessions_user ON training_sessions(user_id);
+
+    ALTER TABLE training_log ADD COLUMN IF NOT EXISTS session_id TEXT DEFAULT NULL;
   `);
 
   schemaInitialized = true;

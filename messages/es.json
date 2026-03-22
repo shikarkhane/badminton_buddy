@@ -106,7 +106,24 @@
     "notesPlaceholder": "¿Cómo fue tu sesión? ¿Alguna mejora notada?",
     "suggestion": "Siguiente Tema Sugerido",
     "suggestionDesc": "Basado en tus últimas 3 sesiones, recomendamos:",
-    "noSuggestion": "Completa al menos 3 sesiones para obtener sugerencias de IA."
+    "noSuggestion": "Completa al menos 3 sesiones para obtener sugerencias de IA.",
+    "selectSession": "Sesión de Entrenamiento (opcional)",
+    "noSession": "-- Sin sesión --"
+  },
+  "sessions": {
+    "title": "Mis Sesiones",
+    "addSession": "Agregar Sesión",
+    "sessionName": "Nombre de Sesión",
+    "namePlaceholder": "ej., Práctica del Martes por la Noche",
+    "dayOfWeek": "Día de la Semana",
+    "startTime": "Hora de Inicio",
+    "assignProgram": "Asignar Programa",
+    "noProgram": "Sin programa asignado",
+    "noProgramAssigned": "Sin programa asignado",
+    "empty": "Aún no hay sesiones. ¡Agrega tus sesiones de entrenamiento semanales!",
+    "viewHistory": "Historial",
+    "hideHistory": "Ocultar Historial",
+    "noHistory": "Aún no hay entrenamientos registrados para esta sesión."
   },
   "settings": {
     "title": "Configuración",
@@ -193,7 +210,8 @@
     "shareWithOrg": "Compartir con Organización",
     "unshare": "Dejar de Compartir",
     "sharedBadge": "Compartido",
-    "sharedBy": "Compartido por"
+    "sharedBy": "Compartido por",
+    "sessions": "Sesiones"
   },
   "community": {
     "title": "Comunidad",

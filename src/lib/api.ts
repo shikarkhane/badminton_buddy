@@ -1,4 +1,4 @@
-import { User, TrainingProgram, TrainingLogEntry, Organization, OrgMember, OrgInvitation, CommunityThread, CommunityPost, ThreadCategory } from "./types";
+import { User, TrainingProgram, TrainingLogEntry, TrainingSession, Organization, OrgMember, OrgInvitation, CommunityThread, CommunityPost, ThreadCategory } from "./types";
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, {
@@ -141,6 +141,7 @@ export async function logTrainingSession(data: {
   levelUsed: number;
   notes: string;
   date: string;
+  sessionId?: string;
 }): Promise<{ entry: TrainingLogEntry }> {
   return fetchJson("/api/training-log", {
     method: "POST",
@@ -258,6 +259,59 @@ export async function createPostReply(orgId: string, threadId: string, content: 
     method: "POST",
     body: JSON.stringify({ content }),
   });
+}
+
+// Training Sessions
+export async function getUserSessions(): Promise<{ sessions: TrainingSession[] }> {
+  return fetchJson("/api/sessions");
+}
+
+export async function createUserSession(data: {
+  name: string;
+  dayOfWeek: number;
+  startTime?: string;
+  programId?: string | null;
+}): Promise<{ session: TrainingSession }> {
+  return fetchJson("/api/sessions", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function getOrgSessions(orgId: string): Promise<{ sessions: TrainingSession[] }> {
+  return fetchJson(`/api/orgs/${orgId}/sessions`);
+}
+
+export async function createOrgSession(orgId: string, data: {
+  name: string;
+  dayOfWeek: number;
+  startTime?: string;
+  programId?: string | null;
+}): Promise<{ session: TrainingSession }> {
+  return fetchJson(`/api/orgs/${orgId}/sessions`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateSessionApi(id: string, data: {
+  name?: string;
+  dayOfWeek?: number;
+  startTime?: string;
+  programId?: string | null;
+}): Promise<{ session: TrainingSession }> {
+  return fetchJson(`/api/sessions/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteSessionApi(id: string): Promise<void> {
+  await fetchJson(`/api/sessions/${id}`, { method: "DELETE" });
+}
+
+export async function getSessionLog(id: string): Promise<{ log: TrainingLogEntry[]; session: TrainingSession }> {
+  return fetchJson(`/api/sessions/${id}/log`);
 }
 
 // Suggestions

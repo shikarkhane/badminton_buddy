@@ -1,5 +1,5 @@
 import pool, { initSchema } from "./pg";
-import { User, TrainingProgram, TrainingLogEntry, Organization, OrgMember, OrgInvitation, CommunityThread, CommunityPost, ThreadCategory } from "./types";
+import { User, TrainingProgram, TrainingLogEntry, TrainingSession, Organization, OrgMember, OrgInvitation, CommunityThread, CommunityPost, ThreadCategory } from "./types";
 import { encrypt, decrypt, hashPassword } from "./crypto";
 
 // Initialize schema on first import
@@ -204,7 +204,9 @@ export async function getUserTrainingLog(
 ): Promise<TrainingLogEntry[]> {
   await ready();
   const { rows } = await pool.query(
-    "SELECT * FROM training_log WHERE user_id = $1 ORDER BY date DESC",
+    `SELECT tl.*, ts.name as session_name FROM training_log tl
+     LEFT JOIN training_sessions ts ON ts.id = tl.session_id
+     WHERE tl.user_id = $1 ORDER BY tl.date DESC`,
     [userId]
   );
   return rows.map(rowToLogEntry);
@@ -227,8 +229,8 @@ export async function createTrainingLogEntry(
 ): Promise<TrainingLogEntry> {
   await ready();
   await pool.query(
-    `INSERT INTO training_log (id, user_id, program_id, program_title, theme, level_used, notes, date, created_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+    `INSERT INTO training_log (id, user_id, program_id, program_title, theme, level_used, notes, date, session_id, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
     [
       entry.id,
       entry.userId,
@@ -238,6 +240,7 @@ export async function createTrainingLogEntry(
       entry.levelUsed,
       entry.notes,
       entry.date,
+      entry.sessionId || null,
       entry.createdAt,
     ]
   );
@@ -430,6 +433,88 @@ export async function getSharedProgramsForUser(userId: string): Promise<Training
     [userId]
   );
   return rows.map(rowToProgram);
+}
+
+// Training Sessions
+export async function createSession(session: TrainingSession): Promise<TrainingSession> {
+  await ready();
+  await pool.query(
+    `INSERT INTO training_sessions (id, org_id, user_id, name, day_of_week, start_time, program_id, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+    [session.id, session.orgId, session.userId, session.name, session.dayOfWeek, session.startTime, session.programId, session.createdAt]
+  );
+  return session;
+}
+
+export async function getOrgSessions(orgId: string): Promise<TrainingSession[]> {
+  await ready();
+  const { rows } = await pool.query(
+    `SELECT s.*, p.title as program_title FROM training_sessions s
+     LEFT JOIN programs p ON p.id = s.program_id
+     WHERE s.org_id = $1 ORDER BY s.day_of_week, s.start_time`,
+    [orgId]
+  );
+  return rows.map(rowToSession);
+}
+
+export async function getUserSessions(userId: string): Promise<TrainingSession[]> {
+  await ready();
+  const { rows } = await pool.query(
+    `SELECT s.*, p.title as program_title FROM training_sessions s
+     LEFT JOIN programs p ON p.id = s.program_id
+     WHERE s.user_id = $1 AND s.org_id IS NULL ORDER BY s.day_of_week, s.start_time`,
+    [userId]
+  );
+  return rows.map(rowToSession);
+}
+
+export async function updateSession(id: string, updates: { name?: string; dayOfWeek?: number; startTime?: string; programId?: string | null }): Promise<TrainingSession | undefined> {
+  await ready();
+  const { rows } = await pool.query(
+    `UPDATE training_sessions SET
+       name = COALESCE($2, name),
+       day_of_week = COALESCE($3, day_of_week),
+       start_time = COALESCE($4, start_time),
+       program_id = $5
+     WHERE id = $1
+     RETURNING *`,
+    [id, updates.name, updates.dayOfWeek, updates.startTime, updates.programId ?? null]
+  );
+  if (!rows[0]) return undefined;
+  // Re-fetch with joined program title
+  const { rows: full } = await pool.query(
+    `SELECT s.*, p.title as program_title FROM training_sessions s
+     LEFT JOIN programs p ON p.id = s.program_id WHERE s.id = $1`,
+    [id]
+  );
+  return full[0] ? rowToSession(full[0]) : undefined;
+}
+
+export async function deleteSession(id: string): Promise<boolean> {
+  await ready();
+  const result = await pool.query("DELETE FROM training_sessions WHERE id = $1", [id]);
+  return (result.rowCount ?? 0) > 0;
+}
+
+export async function getSession(id: string): Promise<TrainingSession | undefined> {
+  await ready();
+  const { rows } = await pool.query(
+    `SELECT s.*, p.title as program_title FROM training_sessions s
+     LEFT JOIN programs p ON p.id = s.program_id WHERE s.id = $1`,
+    [id]
+  );
+  return rows[0] ? rowToSession(rows[0]) : undefined;
+}
+
+export async function getSessionLogHistory(sessionId: string): Promise<TrainingLogEntry[]> {
+  await ready();
+  const { rows } = await pool.query(
+    `SELECT tl.*, ts.name as session_name FROM training_log tl
+     LEFT JOIN training_sessions ts ON ts.id = tl.session_id
+     WHERE tl.session_id = $1 ORDER BY tl.date DESC`,
+    [sessionId]
+  );
+  return rows.map(rowToLogEntry);
 }
 
 // Community Threads
@@ -634,6 +719,22 @@ function rowToLogEntry(row: Record<string, unknown>): TrainingLogEntry {
     levelUsed: row.level_used as number,
     notes: row.notes as string,
     date: row.date as string,
+    sessionId: (row.session_id as string | null) || null,
+    sessionName: (row.session_name as string | null) || null,
+    createdAt: row.created_at as string,
+  };
+}
+
+function rowToSession(row: Record<string, unknown>): TrainingSession {
+  return {
+    id: row.id as string,
+    orgId: (row.org_id as string | null) || null,
+    userId: row.user_id as string,
+    name: row.name as string,
+    dayOfWeek: row.day_of_week as number,
+    startTime: row.start_time as string,
+    programId: (row.program_id as string | null) || null,
+    programTitle: (row.program_title as string | null) || null,
     createdAt: row.created_at as string,
   };
 }

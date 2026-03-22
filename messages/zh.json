@@ -106,7 +106,24 @@
     "notesPlaceholder": "训练感觉如何？有什么进步？",
     "suggestion": "下一个建议主题",
     "suggestionDesc": "根据您最近3次训练，我们建议：",
-    "noSuggestion": "完成至少3次训练以获取AI建议。"
+    "noSuggestion": "完成至少3次训练以获取AI建议。",
+    "selectSession": "训练时段（可选）",
+    "noSession": "-- 无时段 --"
+  },
+  "sessions": {
+    "title": "我的训练时段",
+    "addSession": "添加时段",
+    "sessionName": "时段名称",
+    "namePlaceholder": "例如：周二晚间练习",
+    "dayOfWeek": "星期几",
+    "startTime": "开始时间",
+    "assignProgram": "分配课程",
+    "noProgram": "未分配课程",
+    "noProgramAssigned": "未分配课程",
+    "empty": "还没有训练时段。添加您的每周训练时段吧！",
+    "viewHistory": "历史",
+    "hideHistory": "隐藏历史",
+    "noHistory": "此时段还没有训练记录。"
   },
   "settings": {
     "title": "设置",
@@ -193,7 +210,8 @@
     "shareWithOrg": "与组织共享",
     "unshare": "停止共享",
     "sharedBadge": "已共享",
-    "sharedBy": "共享者"
+    "sharedBy": "共享者",
+    "sessions": "训练时段"
   },
   "community": {
     "title": "社区",

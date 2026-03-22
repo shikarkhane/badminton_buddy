@@ -48,6 +48,20 @@ export interface TrainingLogEntry {
   levelUsed: number;
   notes: string;
   date: string;
+  sessionId?: string | null;
+  sessionName?: string | null;
+  createdAt: string;
+}
+
+export interface TrainingSession {
+  id: string;
+  orgId: string | null;
+  userId: string;
+  name: string;
+  dayOfWeek: number; // 0=Sunday, 1=Monday, ..., 6=Saturday
+  startTime: string; // "HH:MM"
+  programId: string | null;
+  programTitle?: string | null;
   createdAt: string;
 }
 

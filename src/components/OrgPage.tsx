@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "./AuthProvider";
+import SessionManager from "./SessionManager";
 import { Organization, OrgMember, OrgInvitation, TrainingProgram } from "@/lib/types";
 import {
   getOrgs,
@@ -36,7 +37,7 @@ export default function OrgPage() {
   const [error, setError] = useState("");
   const [inviteSuccess, setInviteSuccess] = useState("");
   const [linkCopied, setLinkCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<"members" | "invitations" | "programs">("members");
+  const [activeTab, setActiveTab] = useState<"members" | "invitations" | "programs" | "sessions">("members");
 
   const loadOrgs = useCallback(async () => {
     try {
@@ -293,7 +294,7 @@ export default function OrgPage() {
 
           {/* Tabs */}
           <div className="flex flex-wrap gap-1 sm:gap-2 mb-6 border-b border-gray-200 pb-2">
-            {(["members", "invitations", "programs"] as const).map((tab) => (
+            {(["members", "sessions", "invitations", "programs"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -303,7 +304,7 @@ export default function OrgPage() {
                     : "text-gray-500 hover:text-gray-700"
                 }`}
               >
-                {t(`org.${tab === "programs" ? "sharedPrograms" : tab}`)}
+                {t(`org.${tab === "programs" ? "sharedPrograms" : tab === "sessions" ? "sessions" : tab}`)}
               </button>
             ))}
           </div>
@@ -429,6 +430,14 @@ export default function OrgPage() {
                 </div>
               )}
             </div>
+          )}
+
+          {/* Sessions tab */}
+          {activeTab === "sessions" && selectedOrg && (
+            <SessionManager
+              orgId={selectedOrg.id}
+              programs={sharedPrograms}
+            />
           )}
 
           {/* Shared programs tab */}
