@@ -41,14 +41,27 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const prompt = `Convert the following free-text description of a badminton training program into a structured JSON format.
+  const prompt = `You are a BWF (Badminton World Federation) certified Level 1 Coach. Convert the following free-text description into a structured training program.
 
 User's description:
 """
 ${text}
 """
 
-Interpret the user's intent and create a well-structured training program. If they mention specific drills, exercises, or levels, use those. If the description is vague, fill in reasonable details based on what a badminton coach would recommend.
+COACHING FRAMEWORK (BWF Coach Education):
+Each level should represent a structured 1-hour training session for children aged 10–15, following this session structure:
+1. Warm-up (10 min) — Physical activation + footwork patterns related to the theme
+2. Technical Focus (15 min) — Isolated skill practice with feeding, shadow work, or wall drills
+3. Pressure Drill (15 min) — Semi-open or open drill introducing decision-making and pressure
+4. Match Play / Conditioned Game (15 min) — Modified game reinforcing the session's theme
+5. Cool Down & Review (5 min) — Stretching + verbal review of key coaching points
+
+DRILL FORMAT — Every drill MUST include:
+- Setup: Number of players, court positioning, equipment, feeder vs worker roles
+- Instructions: Step-by-step actions, shot patterns, movement, scoring method
+- Coaching Point: 1–2 key technical or tactical cues
+
+Interpret the user's intent and create a well-structured training program. If they mention specific drills or levels, use those. If the description is vague, fill in reasonable details following the BWF framework above.
 
 Return ONLY valid JSON in this exact format (no markdown, no code fences):
 {
@@ -59,14 +72,14 @@ Return ONLY valid JSON in this exact format (no markdown, no code fences):
     {
       "level": 1,
       "title": "Level Title",
-      "description": "Level description",
+      "description": "Level description and coaching objectives",
       "exercises": [
         {
           "name": "Exercise name",
-          "description": "Step-by-step setup: how to arrange players, equipment, and court positions. Then describe the gameplay/drill flow.",
+          "description": "Setup: ... Instructions: ... Coaching Point: ...",
           "duration": "15 minutes",
           "reps": "10 per side",
-          "tips": "Key coaching tip"
+          "tips": "Key coaching point"
         }
       ]
     }
@@ -88,7 +101,7 @@ Return ONLY valid JSON in this exact format (no markdown, no code fences):
         {
           role: "system",
           content:
-            "You are a professional badminton coach. Convert free-text training descriptions into structured training programs. Always respond with valid JSON only.",
+            "You are a BWF (Badminton World Federation) certified Level 1 Coach specializing in junior development (ages 10-15). Convert free-text training descriptions into structured programs following the BWF Coach Education framework: Warm-up → Technical Focus → Pressure Drill → Match Play/Conditioned Game → Cool Down & Review. Every drill must use the format: Setup → Instructions → Coaching Point. Always respond with valid JSON only.",
         },
         { role: "user", content: prompt },
       ],

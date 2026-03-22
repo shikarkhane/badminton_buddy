@@ -45,30 +45,41 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const prompt = `Create a badminton training program with the following specifications:
+  const prompt = `You are a BWF (Badminton World Federation) certified Level 1 Coach designing a structured training program.
+
+Training Request:
 - Theme: ${theme}
 - Intensity: ${intensity}
 - Number of progression levels: ${levelCount}
 
+COACHING FRAMEWORK (BWF Coach Education):
+Each level should represent a structured 1-hour training session designed for children aged 10–15 years, following this session structure:
+
+1. Warm-up (10 minutes) — Physical activation + footwork patterns related to the session theme
+2. Technical Focus (15 minutes) — Isolated skill practice with feeding, shadow work, or wall drills
+3. Pressure Drill (15 minutes) — Semi-open or open drill that introduces decision-making and pressure
+4. Match Play / Conditioned Game (15 minutes) — Modified game with rules that reinforce the session's theme
+5. Cool Down & Review (5 minutes) — Stretching + verbal review of key coaching points
+
+DRILL FORMAT — Every drill/exercise MUST include:
+- Setup: Number of players, court positioning, equipment needed, feeder vs worker roles
+- Instructions: Step-by-step sequence of what each player does, shot patterns, movement, scoring method
+- Coaching Point: 1–2 key technical or tactical cues the coach should emphasize
+
+Example of a GOOD drill:
+"Setup: Player A at the net (forehand side), Player B at baseline (center). 10 shuttles ready. Instructions: Player B feeds a high clear to Player A's backhand corner. Player A moves using 2-step chassé, plays a straight drop shot, then recovers to base with a split step. Player B catches and re-feeds. After 10 shots, switch roles. Coaching Point: Watch for early racket preparation — racket should be up before the last step into the corner."
+
+Do NOT write vague descriptions like "The player should be in a low stance with good racket position." Always describe what players actively DO.
+
 For each level, provide:
-1. A title (e.g., "Beginner Foundations")
-2. A brief description of the level's focus
-3. 3-5 exercises/drills, each with:
-   - name: A clear drill name
-   - description: IMPORTANT — write this as a practical drill setup and gameplay instruction:
-     * First, explain the SETUP: how many players, where they stand, what equipment is needed, court positioning
-     * Then, explain the DRILL FLOW: what each player does, the sequence of shots/movements, how points are scored or how the drill cycles
-     * Include variations or progressions within the drill where appropriate
-     * Do NOT just describe what the ideal position or technique "looks like" — instead describe what players actually DO step by step
-   - duration: Time (e.g., "15 minutes", "3 sets of 5 minutes")
+1. A title (e.g., "Foundation: Net Kill Basics")
+2. A brief description of the level's coaching focus and objectives
+3. 4-5 exercises following the session structure above, each with:
+   - name: Clear drill name
+   - description: Must follow the Setup → Instructions → Coaching Point format
+   - duration: Time allocation (e.g., "10 minutes", "15 minutes")
    - reps: Number of reps if applicable (optional)
-   - tips: 1-2 key coaching tips for common mistakes
-
-Example of a GOOD drill description:
-"Setup: Player A stands at the net (forehand side), Player B at the baseline (center). Place 3 shuttles on Player B's side. Drill: Player B feeds a high clear to Player A's backhand corner. Player A moves to the corner, plays a drop shot crosscourt, then recovers to center net. Player B picks up the drop and feeds another clear. Repeat 10 times, then switch roles. Progression: Add a third player who intercepts weak drops."
-
-Example of a BAD drill description (do NOT write like this):
-"The player should be in a low stance with knees bent and racket up, ready to intercept at the net."
+   - tips: The coaching point — key technical/tactical cue
 
 Return ONLY valid JSON in this exact format (no markdown, no code fences):
 {
@@ -77,14 +88,14 @@ Return ONLY valid JSON in this exact format (no markdown, no code fences):
     {
       "level": 1,
       "title": "Level Title",
-      "description": "Level description",
+      "description": "Level description and coaching objectives",
       "exercises": [
         {
           "name": "Exercise name",
-          "description": "Setup: ... Drill: ... Progression: ...",
+          "description": "Setup: ... Instructions: ... Coaching Point: ...",
           "duration": "15 minutes",
           "reps": "10 per side",
-          "tips": "Key coaching tip"
+          "tips": "Key coaching point"
         }
       ]
     }
@@ -106,7 +117,7 @@ Return ONLY valid JSON in this exact format (no markdown, no code fences):
         {
           role: "system",
           content:
-            "You are a professional badminton coach creating actionable training programs. Every drill must describe the concrete setup (players, positions, equipment) and the gameplay flow (who does what, shot sequences, scoring). Never describe static positions or ideal form — always describe what players actively do. Respond with valid JSON only, no markdown.",
+            "You are a BWF (Badminton World Federation) certified Level 1 Coach specializing in junior development (ages 10-15). You design structured 1-hour training sessions following the BWF Coach Education framework. Each session must follow a clear progression: Warm-up → Technical Focus → Pressure Drill → Match Play/Conditioned Game → Cool Down & Review. Every drill must use the format: Setup (players, positions, equipment) → Instructions (step-by-step actions, shot sequences, scoring) → Coaching Point (key technical/tactical cue). Never describe static positions or ideal form — always describe what players actively do. Respond with valid JSON only, no markdown.",
         },
         { role: "user", content: prompt },
       ],
