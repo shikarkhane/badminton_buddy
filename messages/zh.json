@@ -56,7 +56,9 @@
     "levels": "级别",
     "intensity": "强度",
     "theme": "主题",
-    "createdAt": "创建于"
+    "createdAt": "创建于",
+    "editProgram": "编辑课程",
+    "saveChanges": "保存更改"
   },
   "create": {
     "title": "创建训练课程",

@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "./AuthProvider";
-import { TrainingProgram, Organization } from "@/lib/types";
+import { TrainingProgram, TrainingLevel, Organization } from "@/lib/types";
 import { getProgram, logTrainingSession, updateProgramApi, getOrgs } from "@/lib/api";
 
 export default function ProgramDetail({ programId }: { programId: string }) {
@@ -17,6 +17,8 @@ export default function ProgramDetail({ programId }: { programId: string }) {
   const [logLevel, setLogLevel] = useState(1);
   const [logNotes, setLogNotes] = useState("");
   const [userOrgs, setUserOrgs] = useState<Organization[]>([]);
+  const [editingLevels, setEditingLevels] = useState<TrainingLevel[] | null>(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (user && !user.isGuest) {
@@ -55,6 +57,46 @@ export default function ProgramDetail({ programId }: { programId: string }) {
       // ignore
     } finally {
       setLogging(false);
+    }
+  };
+
+  const isOwner = user && program?.userId === user.id;
+  const isEditing = editingLevels !== null;
+
+  const startEditing = () => {
+    if (program) setEditingLevels(JSON.parse(JSON.stringify(program.levels)));
+  };
+
+  const cancelEditing = () => setEditingLevels(null);
+
+  const updateExerciseField = (
+    levelIdx: number,
+    exIdx: number,
+    field: string,
+    value: string
+  ) => {
+    if (!editingLevels) return;
+    const updated = [...editingLevels];
+    updated[levelIdx] = {
+      ...updated[levelIdx],
+      exercises: updated[levelIdx].exercises.map((ex, i) =>
+        i === exIdx ? { ...ex, [field]: value } : ex
+      ),
+    };
+    setEditingLevels(updated);
+  };
+
+  const handleSaveEdits = async () => {
+    if (!program || !editingLevels) return;
+    setSaving(true);
+    try {
+      const { program: updated } = await updateProgramApi(program.id, { levels: editingLevels });
+      setProgram(updated);
+      setEditingLevels(null);
+    } catch {
+      // ignore
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -172,9 +214,39 @@ export default function ProgramDetail({ programId }: { programId: string }) {
           </div>
         </div>
 
+        {/* Edit / Save controls */}
+        {isOwner && (
+          <div className="flex gap-3 mb-4">
+            {!isEditing ? (
+              <button
+                onClick={startEditing}
+                className="text-emerald-600 hover:text-emerald-800 text-sm font-medium"
+              >
+                {t("programs.editProgram")}
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={handleSaveEdits}
+                  disabled={saving}
+                  className="bg-emerald-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-emerald-700 transition disabled:opacity-50"
+                >
+                  {saving ? t("common.loading") : t("programs.saveChanges")}
+                </button>
+                <button
+                  onClick={cancelEditing}
+                  className="text-gray-500 hover:text-gray-700 text-sm font-medium"
+                >
+                  {t("common.cancel")}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
         {/* Levels — all expanded */}
         <div className="space-y-6">
-          {program.levels.map((level) => (
+          {(isEditing ? editingLevels! : program.levels).map((level, levelIdx) => (
             <div key={level.level} className="border border-gray-200 rounded-lg overflow-hidden">
               <div className="p-4 bg-gray-50 border-b border-gray-200">
                 <h3 className="font-semibold text-gray-800 text-lg">
@@ -189,14 +261,54 @@ export default function ProgramDetail({ programId }: { programId: string }) {
                   <li key={exIdx} className="p-4 flex gap-4">
                     <span className="text-emerald-600 font-bold text-lg mt-0.5">{exIdx + 1}</span>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-gray-800">{ex.name}</h4>
-                      <p className="text-gray-600 text-sm mt-0.5">{ex.description}</p>
-                      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-500">
-                        <span>Duration: {ex.duration}</span>
-                        {ex.reps && <span>Reps: {ex.reps}</span>}
-                      </div>
-                      {ex.tips && (
-                        <p className="text-emerald-700 text-sm mt-1.5 italic">Tip: {ex.tips}</p>
+                      {isEditing ? (
+                        <div className="space-y-2">
+                          <input
+                            value={ex.name}
+                            onChange={(e) => updateExerciseField(levelIdx, exIdx, "name", e.target.value)}
+                            className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm font-semibold"
+                            placeholder="Exercise name"
+                          />
+                          <textarea
+                            value={ex.description}
+                            onChange={(e) => updateExerciseField(levelIdx, exIdx, "description", e.target.value)}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                            rows={4}
+                            placeholder="Setup: ... Instructions: ... Coaching Point: ..."
+                          />
+                          <div className="grid grid-cols-2 gap-2">
+                            <input
+                              value={ex.duration}
+                              onChange={(e) => updateExerciseField(levelIdx, exIdx, "duration", e.target.value)}
+                              className="border border-gray-300 rounded px-3 py-1.5 text-xs"
+                              placeholder="Duration"
+                            />
+                            <input
+                              value={ex.reps || ""}
+                              onChange={(e) => updateExerciseField(levelIdx, exIdx, "reps", e.target.value)}
+                              className="border border-gray-300 rounded px-3 py-1.5 text-xs"
+                              placeholder="Reps"
+                            />
+                          </div>
+                          <input
+                            value={ex.tips}
+                            onChange={(e) => updateExerciseField(levelIdx, exIdx, "tips", e.target.value)}
+                            className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm italic text-emerald-700"
+                            placeholder="Coaching tip"
+                          />
+                        </div>
+                      ) : (
+                        <>
+                          <h4 className="font-semibold text-gray-800">{ex.name}</h4>
+                          <p className="text-gray-600 text-sm mt-0.5 whitespace-pre-wrap">{ex.description}</p>
+                          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-500">
+                            <span>Duration: {ex.duration}</span>
+                            {ex.reps && <span>Reps: {ex.reps}</span>}
+                          </div>
+                          {ex.tips && (
+                            <p className="text-emerald-700 text-sm mt-1.5 italic">Tip: {ex.tips}</p>
+                          )}
+                        </>
                       )}
                     </div>
                   </li>

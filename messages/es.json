@@ -56,7 +56,9 @@
     "levels": "Niveles",
     "intensity": "Intensidad",
     "theme": "Tema",
-    "createdAt": "Creado"
+    "createdAt": "Creado",
+    "editProgram": "Editar Programa",
+    "saveChanges": "Guardar Cambios"
   },
   "create": {
     "title": "Crear Programa de Entrenamiento",

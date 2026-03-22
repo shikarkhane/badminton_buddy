@@ -56,7 +56,9 @@
     "levels": "Levels",
     "intensity": "Intensity",
     "theme": "Theme",
-    "createdAt": "Created"
+    "createdAt": "Created",
+    "editProgram": "Edit Program",
+    "saveChanges": "Save Changes"
   },
   "create": {
     "title": "Create Training Program",
