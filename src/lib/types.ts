@@ -33,6 +33,8 @@ export interface TrainingProgram {
   isCustom: boolean;
   isAIGenerated: boolean;
   sharedWithOrg: string | null;
+  authorName?: string;
+  orgName?: string;
   createdAt: string;
   updatedAt: string;
 }

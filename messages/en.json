@@ -53,6 +53,9 @@
     "levels": "Levels",
     "intensity": "Intensity",
     "theme": "Theme",
+    "shared": "Shared",
+    "sharedWithMe": "Shared With Me",
+    "sharedBy": "by {name}",
     "createdAt": "Created",
     "editProgram": "Edit Program",
     "saveChanges": "Save Changes"

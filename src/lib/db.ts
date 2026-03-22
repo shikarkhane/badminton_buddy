@@ -408,8 +408,26 @@ export async function deleteInvitation(id: string): Promise<boolean> {
 export async function getOrgSharedPrograms(orgId: string): Promise<TrainingProgram[]> {
   await ready();
   const { rows } = await pool.query(
-    `SELECT * FROM programs WHERE shared_with_org = $1 ORDER BY created_at DESC`,
+    `SELECT p.*, u.name as author_name FROM programs p
+     JOIN users u ON u.id = p.user_id
+     WHERE p.shared_with_org = $1 ORDER BY p.created_at DESC`,
     [orgId]
+  );
+  return rows.map(rowToProgram);
+}
+
+export async function getSharedProgramsForUser(userId: string): Promise<TrainingProgram[]> {
+  await ready();
+  const { rows } = await pool.query(
+    `SELECT p.*, u.name as author_name, o.name as org_name FROM programs p
+     JOIN users u ON u.id = p.user_id
+     JOIN organizations o ON o.id = p.shared_with_org
+     WHERE p.shared_with_org IN (
+       SELECT org_id FROM org_members WHERE user_id = $1
+     )
+     AND p.user_id != $1
+     ORDER BY p.created_at DESC`,
+    [userId]
   );
   return rows.map(rowToProgram);
 }
@@ -599,6 +617,8 @@ function rowToProgram(row: Record<string, unknown>): TrainingProgram {
     isCustom: row.is_custom as boolean,
     isAIGenerated: row.is_ai_generated as boolean,
     sharedWithOrg: (row.shared_with_org as string | null) || null,
+    authorName: row.author_name as string | undefined,
+    orgName: row.org_name as string | undefined,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
   };

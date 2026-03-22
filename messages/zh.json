@@ -53,6 +53,9 @@
     "levels": "级别",
     "intensity": "强度",
     "theme": "主题",
+    "shared": "已共享",
+    "sharedWithMe": "与我共享的课程",
+    "sharedBy": "来自 {name}",
     "createdAt": "创建于",
     "editProgram": "编辑课程",
     "saveChanges": "保存更改"

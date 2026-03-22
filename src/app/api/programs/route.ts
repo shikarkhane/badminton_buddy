@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 import { getCurrentUser } from "@/lib/auth";
-import { getUserPrograms, searchPrograms, createProgram, countUserProgramsToday } from "@/lib/db";
+import { getUserPrograms, searchPrograms, createProgram, countUserProgramsToday, getSharedProgramsForUser } from "@/lib/db";
 import { TrainingProgram } from "@/lib/types";
 
 const DAILY_PROGRAM_LIMIT = 5;
@@ -13,11 +13,21 @@ export async function GET(request: NextRequest) {
   }
 
   const query = request.nextUrl.searchParams.get("q");
-  const programs = query
+  const ownPrograms = query
     ? await searchPrograms(user.id, query)
     : await getUserPrograms(user.id);
 
-  return NextResponse.json({ programs });
+  const sharedPrograms = await getSharedProgramsForUser(user.id);
+
+  // Filter shared programs by search query if present
+  const filteredShared = query
+    ? sharedPrograms.filter((p) => {
+        const q = query.toLowerCase();
+        return p.title.toLowerCase().includes(q) || p.theme.toLowerCase().includes(q) || p.intensity.toLowerCase().includes(q);
+      })
+    : sharedPrograms;
+
+  return NextResponse.json({ programs: ownPrograms, sharedPrograms: filteredShared });
 }
 
 export async function POST(request: NextRequest) {

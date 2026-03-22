@@ -456,6 +456,11 @@ export default function OrgPage() {
                             <span>
                               {program.levels.length} {t("programs.levels")}
                             </span>
+                            {program.authorName && (
+                              <span className="text-xs text-gray-400">
+                                {t("programs.sharedBy", { name: program.authorName })}
+                              </span>
+                            )}
                           </div>
                         </div>
                         <Link

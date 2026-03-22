@@ -11,14 +11,16 @@ export default function ProgramList() {
   const t = useTranslations();
   const { user } = useAuth();
   const [programs, setPrograms] = useState<TrainingProgram[]>([]);
+  const [sharedPrograms, setSharedPrograms] = useState<TrainingProgram[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
   const loadPrograms = useCallback(async () => {
     setLoading(true);
     try {
-      const { programs } = await getPrograms(search || undefined);
-      setPrograms(programs);
+      const data = await getPrograms(search || undefined);
+      setPrograms(data.programs);
+      setSharedPrograms(data.sharedPrograms || []);
     } catch {
       // ignore
     } finally {
@@ -80,7 +82,7 @@ export default function ProgramList() {
 
       {loading ? (
         <p className="text-gray-500">{t("common.loading")}</p>
-      ) : programs.length === 0 ? (
+      ) : programs.length === 0 && sharedPrograms.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-500 mb-4">{t("programs.empty")}</p>
           <Link
@@ -91,67 +93,131 @@ export default function ProgramList() {
           </Link>
         </div>
       ) : (
-        <div className="grid gap-4">
-          {programs.map((program) => (
-            <div
-              key={program.id}
-              className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition"
-            >
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
-                      {program.title}
-                    </h3>
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-full ${
-                        program.isAIGenerated
-                          ? "bg-purple-100 text-purple-700"
-                          : "bg-blue-100 text-blue-700"
-                      }`}
-                    >
-                      {program.isAIGenerated
-                        ? t("programs.aiGenerated")
-                        : t("programs.custom")}
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-2 sm:gap-3 text-sm text-gray-500">
-                    <span>
-                      {t("programs.theme")}: {program.theme}
-                    </span>
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-xs ${
-                        intensityColors[program.intensity]
-                      }`}
-                    >
-                      {t(`intensity.${program.intensity}`)}
-                    </span>
-                    <span>
-                      {program.levels.length} {t("programs.levels")}
-                    </span>
-                    <span>
-                      {new Date(program.createdAt).toLocaleDateString()}
-                    </span>
+        <>
+          {programs.length > 0 && (
+            <div className="grid gap-4">
+              {programs.map((program) => (
+                <div
+                  key={program.id}
+                  className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition"
+                >
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+                          {program.title}
+                        </h3>
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full ${
+                            program.isAIGenerated
+                              ? "bg-purple-100 text-purple-700"
+                              : "bg-blue-100 text-blue-700"
+                          }`}
+                        >
+                          {program.isAIGenerated
+                            ? t("programs.aiGenerated")
+                            : t("programs.custom")}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2 sm:gap-3 text-sm text-gray-500">
+                        <span>
+                          {t("programs.theme")}: {program.theme}
+                        </span>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-xs ${
+                            intensityColors[program.intensity]
+                          }`}
+                        >
+                          {t(`intensity.${program.intensity}`)}
+                        </span>
+                        <span>
+                          {program.levels.length} {t("programs.levels")}
+                        </span>
+                        <span>
+                          {new Date(program.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex gap-3 sm:gap-2 sm:ml-4 sm:flex-shrink-0">
+                      <Link
+                        href={`/programs/${program.id}`}
+                        className="text-emerald-600 hover:text-emerald-800 text-sm font-medium"
+                      >
+                        {t("common.viewDetails")}
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(program.id)}
+                        className="text-red-400 hover:text-red-600 text-sm"
+                      >
+                        {t("common.delete")}
+                      </button>
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-3 sm:gap-2 sm:ml-4 sm:flex-shrink-0">
-                  <Link
-                    href={`/programs/${program.id}`}
-                    className="text-emerald-600 hover:text-emerald-800 text-sm font-medium"
+              ))}
+            </div>
+          )}
+
+          {sharedPrograms.length > 0 && (
+            <div className="mt-8">
+              <h2 className="text-xl font-semibold text-gray-700 mb-4">
+                {t("programs.sharedWithMe")}
+              </h2>
+              <div className="grid gap-4">
+                {sharedPrograms.map((program) => (
+                  <div
+                    key={program.id}
+                    className="bg-white rounded-xl shadow-sm border border-blue-100 p-4 sm:p-6 hover:shadow-md transition"
                   >
-                    {t("common.viewDetails")}
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(program.id)}
-                    className="text-red-400 hover:text-red-600 text-sm"
-                  >
-                    {t("common.delete")}
-                  </button>
-                </div>
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+                            {program.title}
+                          </h3>
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                            {t("programs.shared")}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-2 sm:gap-3 text-sm text-gray-500">
+                          <span>
+                            {t("programs.theme")}: {program.theme}
+                          </span>
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-xs ${
+                              intensityColors[program.intensity]
+                            }`}
+                          >
+                            {t(`intensity.${program.intensity}`)}
+                          </span>
+                          <span>
+                            {program.levels.length} {t("programs.levels")}
+                          </span>
+                          {program.authorName && (
+                            <span>
+                              {t("programs.sharedBy", { name: program.authorName })}
+                            </span>
+                          )}
+                          {program.orgName && (
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                              {program.orgName}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <Link
+                        href={`/programs/${program.id}`}
+                        className="text-emerald-600 hover:text-emerald-800 text-sm font-medium sm:ml-4 sm:flex-shrink-0"
+                      >
+                        {t("common.viewDetails")}
+                      </Link>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );

@@ -66,7 +66,7 @@ export async function updatePassword(data: {
 // Programs
 export async function getPrograms(
   query?: string
-): Promise<{ programs: TrainingProgram[] }> {
+): Promise<{ programs: TrainingProgram[]; sharedPrograms: TrainingProgram[] }> {
   const url = query
     ? `/api/programs?q=${encodeURIComponent(query)}`
     : "/api/programs";
