@@ -5,11 +5,11 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "./AuthProvider";
 import { TrainingProgram } from "@/lib/types";
-import { getPrograms, deleteProgramApi } from "@/lib/api";
+import { getPrograms, getOrgPrograms, deleteProgramApi } from "@/lib/api";
 
 export default function ProgramList() {
   const t = useTranslations();
-  const { user } = useAuth();
+  const { user, actingAs } = useAuth();
   const [programs, setPrograms] = useState<TrainingProgram[]>([]);
   const [sharedPrograms, setSharedPrograms] = useState<TrainingProgram[]>([]);
   const [search, setSearch] = useState("");
@@ -18,15 +18,21 @@ export default function ProgramList() {
   const loadPrograms = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getPrograms(search || undefined);
-      setPrograms(data.programs);
-      setSharedPrograms(data.sharedPrograms || []);
+      if (actingAs.type === "org") {
+        const data = await getOrgPrograms(actingAs.orgId);
+        setPrograms(data.programs);
+        setSharedPrograms([]);
+      } else {
+        const data = await getPrograms(search || undefined);
+        setPrograms(data.programs);
+        setSharedPrograms(data.sharedPrograms || []);
+      }
     } catch {
       // ignore
     } finally {
       setLoading(false);
     }
-  }, [search]);
+  }, [search, actingAs]);
 
   useEffect(() => {
     const timer = setTimeout(loadPrograms, 300);
@@ -49,9 +55,15 @@ export default function ProgramList() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
+      {actingAs.type === "org" && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 mb-4 text-sm text-blue-700">
+          {t("actAs.actingAsOrg", { orgName: actingAs.orgName })}
+        </div>
+      )}
+
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-emerald-800">
-          {t("programs.title")}
+          {actingAs.type === "org" ? actingAs.orgName : t("programs.title")}
         </h1>
         <Link
           href="/create"

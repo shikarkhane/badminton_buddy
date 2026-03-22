@@ -6,16 +6,20 @@ import { TrainingLogEntry, TrainingProgram, TrainingSession } from "@/lib/types"
 import {
   getTrainingLog,
   getPrograms,
+  getOrgPrograms,
   logTrainingSession,
   getSuggestion,
   getUserSessions,
+  getOrgSessions,
 } from "@/lib/api";
+import { useAuth } from "./AuthProvider";
 import SessionManager from "./SessionManager";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function Timeline() {
   const t = useTranslations();
+  const { actingAs } = useAuth();
   const [log, setLog] = useState<TrainingLogEntry[]>([]);
   const [programs, setPrograms] = useState<TrainingProgram[]>([]);
   const [sessions, setSessions] = useState<TrainingSession[]>([]);
@@ -39,11 +43,13 @@ export default function Timeline() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
+      const isOrg = actingAs.type === "org";
+
       const [logRes, progRes, sugRes, sessRes] = await Promise.all([
         getTrainingLog(),
-        getPrograms(),
+        isOrg ? getOrgPrograms(actingAs.orgId) : getPrograms(),
         getSuggestion(),
-        getUserSessions(),
+        isOrg ? getOrgSessions(actingAs.orgId) : getUserSessions(),
       ]);
       setLog(logRes.log);
       setPrograms(progRes.programs);
@@ -54,7 +60,7 @@ export default function Timeline() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [actingAs]);
 
   useEffect(() => {
     loadData();
@@ -81,12 +87,19 @@ export default function Timeline() {
   };
 
   const selectedProg = programs.find((p) => p.id === selectedProgram);
+  const orgId = actingAs.type === "org" ? actingAs.orgId : undefined;
 
   if (loading)
     return <p className="p-8 text-gray-500">{t("common.loading")}</p>;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
+      {actingAs.type === "org" && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 mb-4 text-sm text-blue-700">
+          {t("actAs.actingAsOrg", { orgName: actingAs.orgName })}
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-emerald-800">
           {t("timeline.title")}
@@ -244,7 +257,7 @@ export default function Timeline() {
         </button>
         {showSessions && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
-            <SessionManager programs={programs} />
+            <SessionManager orgId={orgId} programs={programs} />
           </div>
         )}
       </div>

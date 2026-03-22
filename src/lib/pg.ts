@@ -171,6 +171,8 @@ export async function initSchema() {
     CREATE INDEX IF NOT EXISTS idx_training_sessions_user ON training_sessions(user_id);
 
     ALTER TABLE training_log ADD COLUMN IF NOT EXISTS session_id TEXT DEFAULT NULL;
+
+    ALTER TABLE training_sessions ADD COLUMN IF NOT EXISTS recurrence_rule JSONB DEFAULT NULL;
   `);
 
   schemaInitialized = true;

@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
-  const { name, dayOfWeek, startTime, programId } = body;
+  const { name, dayOfWeek, startTime, programId, recurrenceRule } = body;
 
   if (!name || dayOfWeek === undefined) {
     return NextResponse.json({ error: "Name and day of week are required" }, { status: 400 });
@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
     dayOfWeek: Number(dayOfWeek),
     startTime: startTime || "18:00",
     programId: programId || null,
+    recurrenceRule: recurrenceRule || null,
     createdAt: new Date().toISOString(),
   });
 

@@ -53,6 +53,13 @@ export interface TrainingLogEntry {
   createdAt: string;
 }
 
+export interface RecurrenceRule {
+  type: "weekly" | "biweekly" | "custom";
+  daysOfWeek: number[]; // 0=Sunday through 6=Saturday
+  startDate?: string; // ISO date, anchor for biweekly
+  endDate?: string | null;
+}
+
 export interface TrainingSession {
   id: string;
   orgId: string | null;
@@ -62,8 +69,13 @@ export interface TrainingSession {
   startTime: string; // "HH:MM"
   programId: string | null;
   programTitle?: string | null;
+  recurrenceRule?: RecurrenceRule | null;
   createdAt: string;
 }
+
+export type ActingAs =
+  | { type: "personal" }
+  | { type: "org"; orgId: string; orgName: string };
 
 export interface Organization {
   id: string;

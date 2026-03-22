@@ -8,8 +8,36 @@ import { useState } from "react";
 
 export default function Navbar() {
   const t = useTranslations();
-  const { user, logout, pendingInvitations } = useAuth();
+  const { user, logout, pendingInvitations, actingAs, setActingAs, userOrgs } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleActingAsChange = (value: string) => {
+    if (value === "personal") {
+      setActingAs({ type: "personal" });
+    } else {
+      const org = userOrgs.find((o) => o.id === value);
+      if (org) {
+        setActingAs({ type: "org", orgId: org.id, orgName: org.name });
+      }
+    }
+  };
+
+  const actingAsValue = actingAs.type === "personal" ? "personal" : actingAs.orgId;
+
+  const contextSwitcher = userOrgs.length > 0 && (
+    <select
+      value={actingAsValue}
+      onChange={(e) => handleActingAsChange(e.target.value)}
+      className="bg-emerald-800 text-white text-sm border border-emerald-500 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+    >
+      <option value="personal">{t("actAs.personal")}</option>
+      {userOrgs.map((org) => (
+        <option key={org.id} value={org.id}>
+          {org.name}
+        </option>
+      ))}
+    </select>
+  );
 
   return (
     <nav className="bg-emerald-700 text-white shadow-lg">
@@ -63,6 +91,7 @@ export default function Navbar() {
                   {t("nav.settings")}
                 </Link>
                 <div className="flex items-center gap-3 ml-4 pl-4 border-l border-emerald-500">
+                  {contextSwitcher}
                   <span className="text-sm text-emerald-200">{user.name}</span>
                   <button
                     onClick={logout}
@@ -115,6 +144,23 @@ export default function Navbar() {
         {/* Mobile menu */}
         {user && menuOpen && (
           <div className="md:hidden pb-4 space-y-2">
+            {userOrgs.length > 0 && (
+              <div className="py-2">
+                <label className="text-xs text-emerald-300 block mb-1">{t("actAs.label")}</label>
+                <select
+                  value={actingAsValue}
+                  onChange={(e) => handleActingAsChange(e.target.value)}
+                  className="bg-emerald-800 text-white text-sm border border-emerald-500 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-emerald-300"
+                >
+                  <option value="personal">{t("actAs.personal")}</option>
+                  {userOrgs.map((org) => (
+                    <option key={org.id} value={org.id}>
+                      {org.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <Link
               href="/programs"
               className="block py-2 hover:text-emerald-200"

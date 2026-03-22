@@ -25,6 +25,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     dayOfWeek: body.dayOfWeek,
     startTime: body.startTime,
     programId: body.programId,
+    recurrenceRule: body.recurrenceRule,
   });
 
   return NextResponse.json({ session: updated });

@@ -121,9 +121,20 @@
     "noProgram": "No program assigned",
     "noProgramAssigned": "No program assigned",
     "empty": "No sessions yet. Add your weekly training sessions!",
+    "recurrence": "Recurrence",
+    "weekly": "Weekly",
+    "biweekly": "Bi-weekly",
+    "specificDays": "Specific Days",
+    "selectDays": "Select days",
+    "selectMultipleDays": "Click multiple days to select",
     "viewHistory": "History",
     "hideHistory": "Hide History",
     "noHistory": "No training logged for this session yet."
+  },
+  "actAs": {
+    "label": "Acting as",
+    "personal": "Personal",
+    "actingAsOrg": "Viewing as {orgName}"
   },
   "settings": {
     "title": "Settings",

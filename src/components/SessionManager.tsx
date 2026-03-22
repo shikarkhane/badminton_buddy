@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
-import { TrainingSession, TrainingProgram, TrainingLogEntry } from "@/lib/types";
+import { TrainingSession, TrainingProgram, TrainingLogEntry, RecurrenceRule } from "@/lib/types";
 import {
   getUserSessions,
   createUserSession,
@@ -32,6 +32,8 @@ export default function SessionManager({ orgId, programs }: Props) {
   const [dayOfWeek, setDayOfWeek] = useState(1);
   const [startTime, setStartTime] = useState("18:00");
   const [programId, setProgramId] = useState<string | null>(null);
+  const [recurrenceType, setRecurrenceType] = useState<"weekly" | "biweekly" | "custom">("weekly");
+  const [selectedDays, setSelectedDays] = useState<number[]>([1]);
 
   // Session history
   const [historySessionId, setHistorySessionId] = useState<string | null>(null);
@@ -61,33 +63,51 @@ export default function SessionManager({ orgId, programs }: Props) {
     setDayOfWeek(1);
     setStartTime("18:00");
     setProgramId(null);
+    setRecurrenceType("weekly");
+    setSelectedDays([1]);
     setShowForm(false);
     setEditingId(null);
   };
 
+  const buildRecurrenceRule = (): RecurrenceRule | null => {
+    if (recurrenceType === "weekly" && selectedDays.length === 1) {
+      return null; // simple weekly on single day, no need for rule
+    }
+    return {
+      type: recurrenceType,
+      daysOfWeek: [...selectedDays].sort(),
+      startDate: recurrenceType === "biweekly" ? new Date().toISOString().split("T")[0] : undefined,
+    };
+  };
+
   const handleSubmit = async () => {
     if (!name.trim()) return;
+    const rule = buildRecurrenceRule();
+    const primaryDay = selectedDays.length > 0 ? selectedDays[0] : dayOfWeek;
     try {
       if (editingId) {
         await updateSessionApi(editingId, {
           name: name.trim(),
-          dayOfWeek,
+          dayOfWeek: primaryDay,
           startTime,
           programId,
+          recurrenceRule: rule,
         });
       } else if (orgId) {
         await createOrgSession(orgId, {
           name: name.trim(),
-          dayOfWeek,
+          dayOfWeek: primaryDay,
           startTime,
           programId,
+          recurrenceRule: rule,
         });
       } else {
         await createUserSession({
           name: name.trim(),
-          dayOfWeek,
+          dayOfWeek: primaryDay,
           startTime,
           programId,
+          recurrenceRule: rule,
         });
       }
       resetForm();
@@ -103,6 +123,13 @@ export default function SessionManager({ orgId, programs }: Props) {
     setDayOfWeek(session.dayOfWeek);
     setStartTime(session.startTime);
     setProgramId(session.programId);
+    if (session.recurrenceRule) {
+      setRecurrenceType(session.recurrenceRule.type);
+      setSelectedDays(session.recurrenceRule.daysOfWeek);
+    } else {
+      setRecurrenceType("weekly");
+      setSelectedDays([session.dayOfWeek]);
+    }
     setShowForm(true);
   };
 
@@ -132,13 +159,31 @@ export default function SessionManager({ orgId, programs }: Props) {
     }
   };
 
-  // Group sessions by day
+  const toggleDay = (day: number) => {
+    setSelectedDays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
+    );
+  };
+
+  // Group sessions by day. For recurring sessions, show under each day
   const sessionsByDay = new Map<number, TrainingSession[]>();
   sessions.forEach((s) => {
-    const list = sessionsByDay.get(s.dayOfWeek) || [];
-    list.push(s);
-    sessionsByDay.set(s.dayOfWeek, list);
+    const days = s.recurrenceRule?.daysOfWeek ?? [s.dayOfWeek];
+    days.forEach((d) => {
+      const list = sessionsByDay.get(d) || [];
+      list.push(s);
+      sessionsByDay.set(d, list);
+    });
   });
+
+  const getSessionDaysLabel = (session: TrainingSession): string => {
+    if (session.recurrenceRule) {
+      const days = session.recurrenceRule.daysOfWeek.map((d) => DAY_NAMES[d]).join(", ");
+      if (session.recurrenceRule.type === "biweekly") return `${days} (${t("sessions.biweekly")})`;
+      return days;
+    }
+    return DAY_NAMES[session.dayOfWeek];
+  };
 
   if (loading) return <p className="text-gray-500 text-sm">{t("common.loading")}</p>;
 
@@ -169,18 +214,56 @@ export default function SessionManager({ orgId, programs }: Props) {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">{t("sessions.dayOfWeek")}</label>
+              <label className="block text-xs font-medium text-gray-600 mb-1">{t("sessions.recurrence")}</label>
               <select
-                value={dayOfWeek}
-                onChange={(e) => setDayOfWeek(Number(e.target.value))}
+                value={recurrenceType}
+                onChange={(e) => {
+                  const val = e.target.value as "weekly" | "biweekly" | "custom";
+                  setRecurrenceType(val);
+                  if (val === "weekly" && selectedDays.length === 0) setSelectedDays([1]);
+                }}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
               >
-                {DAY_NAMES.map((d, i) => (
-                  <option key={i} value={i}>{d}</option>
-                ))}
+                <option value="weekly">{t("sessions.weekly")}</option>
+                <option value="biweekly">{t("sessions.biweekly")}</option>
+                <option value="custom">{t("sessions.specificDays")}</option>
               </select>
             </div>
           </div>
+
+          {/* Day selection */}
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">{t("sessions.selectDays")}</label>
+            <div className="flex gap-1 flex-wrap">
+              {DAY_NAMES.map((d, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => {
+                    if (recurrenceType === "weekly" && selectedDays.length === 1 && selectedDays[0] !== i) {
+                      setSelectedDays([i]);
+                    } else if (recurrenceType === "weekly") {
+                      // weekly = single day only
+                      setSelectedDays([i]);
+                    } else {
+                      toggleDay(i);
+                    }
+                  }}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+                    selectedDays.includes(i)
+                      ? "bg-emerald-600 text-white"
+                      : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                  }`}
+                >
+                  {d}
+                </button>
+              ))}
+            </div>
+            {recurrenceType !== "weekly" && (
+              <p className="text-xs text-gray-400 mt-1">{t("sessions.selectMultipleDays")}</p>
+            )}
+          </div>
+
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">{t("sessions.startTime")}</label>
@@ -208,7 +291,7 @@ export default function SessionManager({ orgId, programs }: Props) {
           <div className="flex gap-2">
             <button
               onClick={handleSubmit}
-              disabled={!name.trim()}
+              disabled={!name.trim() || selectedDays.length === 0}
               className="bg-emerald-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-emerald-700 transition disabled:opacity-50"
             >
               {editingId ? t("common.save") : t("sessions.addSession")}
@@ -231,17 +314,26 @@ export default function SessionManager({ orgId, programs }: Props) {
           {DAY_NAMES.map((dayName, dayIdx) => {
             const daySessions = sessionsByDay.get(dayIdx);
             if (!daySessions || daySessions.length === 0) return null;
+            // Deduplicate (a recurring session might appear under multiple days)
+            const uniqueSessions = daySessions.filter(
+              (s, i, arr) => arr.findIndex((x) => x.id === s.id) === i
+            );
             return (
               <div key={dayIdx}>
                 <h4 className="text-sm font-semibold text-gray-600 mb-1">{dayName}</h4>
                 <div className="space-y-2">
-                  {daySessions.map((session) => (
-                    <div key={session.id}>
+                  {uniqueSessions.map((session) => (
+                    <div key={`${session.id}-${dayIdx}`}>
                       <div className="bg-gray-50 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="min-w-0">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-medium text-gray-800">{session.name}</span>
                             <span className="text-xs text-gray-400">{session.startTime}</span>
+                            {session.recurrenceRule && (
+                              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                                {getSessionDaysLabel(session)}
+                              </span>
+                            )}
                           </div>
                           {session.programTitle && (
                             <p className="text-sm text-emerald-600 mt-0.5">

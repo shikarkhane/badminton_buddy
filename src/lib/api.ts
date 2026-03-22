@@ -1,4 +1,4 @@
-import { User, TrainingProgram, TrainingLogEntry, TrainingSession, Organization, OrgMember, OrgInvitation, CommunityThread, CommunityPost, ThreadCategory } from "./types";
+import { User, TrainingProgram, TrainingLogEntry, TrainingSession, RecurrenceRule, Organization, OrgMember, OrgInvitation, CommunityThread, CommunityPost, ThreadCategory } from "./types";
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, {
@@ -271,6 +271,7 @@ export async function createUserSession(data: {
   dayOfWeek: number;
   startTime?: string;
   programId?: string | null;
+  recurrenceRule?: RecurrenceRule | null;
 }): Promise<{ session: TrainingSession }> {
   return fetchJson("/api/sessions", {
     method: "POST",
@@ -287,6 +288,7 @@ export async function createOrgSession(orgId: string, data: {
   dayOfWeek: number;
   startTime?: string;
   programId?: string | null;
+  recurrenceRule?: RecurrenceRule | null;
 }): Promise<{ session: TrainingSession }> {
   return fetchJson(`/api/orgs/${orgId}/sessions`, {
     method: "POST",
@@ -299,6 +301,7 @@ export async function updateSessionApi(id: string, data: {
   dayOfWeek?: number;
   startTime?: string;
   programId?: string | null;
+  recurrenceRule?: RecurrenceRule | null;
 }): Promise<{ session: TrainingSession }> {
   return fetchJson(`/api/sessions/${id}`, {
     method: "PUT",

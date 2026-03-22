@@ -121,9 +121,20 @@
     "noProgram": "未分配课程",
     "noProgramAssigned": "未分配课程",
     "empty": "还没有训练时段。添加您的每周训练时段吧！",
+    "recurrence": "重复方式",
+    "weekly": "每周",
+    "biweekly": "隔周",
+    "specificDays": "自定义天数",
+    "selectDays": "选择日期",
+    "selectMultipleDays": "点击多个日期进行选择",
     "viewHistory": "历史",
     "hideHistory": "隐藏历史",
     "noHistory": "此时段还没有训练记录。"
+  },
+  "actAs": {
+    "label": "身份切换",
+    "personal": "个人",
+    "actingAsOrg": "以 {orgName} 身份查看"
   },
   "settings": {
     "title": "设置",

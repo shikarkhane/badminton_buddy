@@ -121,9 +121,20 @@
     "noProgram": "Sin programa asignado",
     "noProgramAssigned": "Sin programa asignado",
     "empty": "Aún no hay sesiones. ¡Agrega tus sesiones de entrenamiento semanales!",
+    "recurrence": "Recurrencia",
+    "weekly": "Semanal",
+    "biweekly": "Quincenal",
+    "specificDays": "Días Específicos",
+    "selectDays": "Seleccionar días",
+    "selectMultipleDays": "Haz clic en varios días para seleccionar",
     "viewHistory": "Historial",
     "hideHistory": "Ocultar Historial",
     "noHistory": "Aún no hay entrenamientos registrados para esta sesión."
+  },
+  "actAs": {
+    "label": "Actuando como",
+    "personal": "Personal",
+    "actingAsOrg": "Viendo como {orgName}"
   },
   "settings": {
     "title": "Configuración",

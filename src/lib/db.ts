@@ -1,5 +1,5 @@
 import pool, { initSchema } from "./pg";
-import { User, TrainingProgram, TrainingLogEntry, TrainingSession, Organization, OrgMember, OrgInvitation, CommunityThread, CommunityPost, ThreadCategory } from "./types";
+import { User, TrainingProgram, TrainingLogEntry, TrainingSession, RecurrenceRule, Organization, OrgMember, OrgInvitation, CommunityThread, CommunityPost, ThreadCategory } from "./types";
 import { encrypt, decrypt, hashPassword } from "./crypto";
 
 // Initialize schema on first import
@@ -439,9 +439,9 @@ export async function getSharedProgramsForUser(userId: string): Promise<Training
 export async function createSession(session: TrainingSession): Promise<TrainingSession> {
   await ready();
   await pool.query(
-    `INSERT INTO training_sessions (id, org_id, user_id, name, day_of_week, start_time, program_id, created_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-    [session.id, session.orgId, session.userId, session.name, session.dayOfWeek, session.startTime, session.programId, session.createdAt]
+    `INSERT INTO training_sessions (id, org_id, user_id, name, day_of_week, start_time, program_id, recurrence_rule, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+    [session.id, session.orgId, session.userId, session.name, session.dayOfWeek, session.startTime, session.programId, session.recurrenceRule ? JSON.stringify(session.recurrenceRule) : null, session.createdAt]
   );
   return session;
 }
@@ -468,17 +468,18 @@ export async function getUserSessions(userId: string): Promise<TrainingSession[]
   return rows.map(rowToSession);
 }
 
-export async function updateSession(id: string, updates: { name?: string; dayOfWeek?: number; startTime?: string; programId?: string | null }): Promise<TrainingSession | undefined> {
+export async function updateSession(id: string, updates: { name?: string; dayOfWeek?: number; startTime?: string; programId?: string | null; recurrenceRule?: RecurrenceRule | null }): Promise<TrainingSession | undefined> {
   await ready();
   const { rows } = await pool.query(
     `UPDATE training_sessions SET
        name = COALESCE($2, name),
        day_of_week = COALESCE($3, day_of_week),
        start_time = COALESCE($4, start_time),
-       program_id = $5
+       program_id = $5,
+       recurrence_rule = $6
      WHERE id = $1
      RETURNING *`,
-    [id, updates.name, updates.dayOfWeek, updates.startTime, updates.programId ?? null]
+    [id, updates.name, updates.dayOfWeek, updates.startTime, updates.programId ?? null, updates.recurrenceRule ? JSON.stringify(updates.recurrenceRule) : null]
   );
   if (!rows[0]) return undefined;
   // Re-fetch with joined program title
@@ -726,6 +727,12 @@ function rowToLogEntry(row: Record<string, unknown>): TrainingLogEntry {
 }
 
 function rowToSession(row: Record<string, unknown>): TrainingSession {
+  let recurrenceRule: RecurrenceRule | null = null;
+  if (row.recurrence_rule) {
+    recurrenceRule = typeof row.recurrence_rule === "string"
+      ? JSON.parse(row.recurrence_rule)
+      : row.recurrence_rule as RecurrenceRule;
+  }
   return {
     id: row.id as string,
     orgId: (row.org_id as string | null) || null,
@@ -735,6 +742,7 @@ function rowToSession(row: Record<string, unknown>): TrainingSession {
     startTime: row.start_time as string,
     programId: (row.program_id as string | null) || null,
     programTitle: (row.program_title as string | null) || null,
+    recurrenceRule,
     createdAt: row.created_at as string,
   };
 }
