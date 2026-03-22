@@ -5,12 +5,10 @@ import Link from "next/link";
 import ShuttleLabLogo from "./ShuttleLabLogo";
 
 const features = [
-  { key: "feature1", icon: "&#129302;" },
-  { key: "feature2", icon: "&#128200;" },
-  { key: "feature3", icon: "&#128161;" },
-  { key: "feature4", icon: "&#9999;&#65039;" },
-  { key: "feature5", icon: "&#127942;" },
-  { key: "feature6", icon: "&#128202;" },
+  { key: "feature1", icon: "&#129302;", href: "/create" },
+  { key: "feature2", icon: "&#127970;", href: "/org" },
+  { key: "feature3", icon: "&#128203;", href: "/timeline" },
+  { key: "feature4", icon: "&#127760;", href: "/community" },
 ] as const;
 
 export default function LandingPage() {
@@ -49,12 +47,13 @@ export default function LandingPage() {
 
       {/* Features */}
       <section className="py-10 sm:py-16 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
-            {features.map(({ key, icon }) => (
-              <div
+        <div className="max-w-5xl mx-auto">
+          <div className="grid sm:grid-cols-2 gap-4 sm:gap-8">
+            {features.map(({ key, icon, href }) => (
+              <Link
                 key={key}
-                className="bg-emerald-50 rounded-xl p-6 hover:shadow-lg transition"
+                href={href}
+                className="bg-emerald-50 rounded-xl p-6 hover:shadow-lg transition block"
               >
                 <div
                   className="text-4xl mb-4"
@@ -64,7 +63,7 @@ export default function LandingPage() {
                   {t(`${key}Title`)}
                 </h3>
                 <p className="text-gray-600">{t(`${key}Desc`)}</p>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
