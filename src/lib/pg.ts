@@ -147,6 +147,14 @@ export async function initSchema() {
     CREATE INDEX IF NOT EXISTS idx_ai_usage_user ON ai_usage(user_id, used_at);
 
     ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT;
+
+    CREATE TABLE IF NOT EXISTS login_events (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      logged_in_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_login_events_user ON login_events(user_id, logged_in_at);
   `);
 
   schemaInitialized = true;

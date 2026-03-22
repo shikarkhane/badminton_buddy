@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { loginWithEmail, createGuestUser, getSessionCookieName } from "@/lib/auth";
+import { recordLoginEvent } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -14,6 +15,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: result.error }, { status: 401 });
     }
 
+    await recordLoginEvent(result.user.id);
+
     const response = NextResponse.json({ user: result.user });
     response.cookies.set(getSessionCookieName(), result.user.id, {
       httpOnly: true,
@@ -26,6 +29,8 @@ export async function POST(request: NextRequest) {
 
   // Guest login
   const user = await createGuestUser();
+  await recordLoginEvent(user.id);
+
   const response = NextResponse.json({ user });
   response.cookies.set(getSessionCookieName(), user.id, {
     httpOnly: true,

@@ -34,6 +34,8 @@ export default function OrgPage() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
+  const [inviteSuccess, setInviteSuccess] = useState("");
+  const [linkCopied, setLinkCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<"members" | "invitations" | "programs">("members");
 
   const loadOrgs = useCallback(async () => {
@@ -115,13 +117,23 @@ export default function OrgPage() {
   const handleInvite = async () => {
     if (!selectedOrg || !inviteEmail.trim()) return;
     setError("");
+    setInviteSuccess("");
     try {
       await inviteToOrg(selectedOrg.id, inviteEmail.trim());
+      setInviteSuccess(inviteEmail.trim());
       setInviteEmail("");
+      setLinkCopied(false);
       loadOrgDetails(selectedOrg.id);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to invite");
     }
+  };
+
+  const handleCopyInviteLink = () => {
+    const link = `${window.location.origin}/org`;
+    navigator.clipboard.writeText(link);
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 3000);
   };
 
   const handleRemoveMember = async (userId: string) => {
@@ -317,6 +329,23 @@ export default function OrgPage() {
                   {t("org.sendInvite")}
                 </button>
               </div>
+
+              {inviteSuccess && (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 mb-4">
+                  <p className="text-emerald-700 text-sm mb-2">
+                    {t("org.inviteSentTo", { email: inviteSuccess })}
+                  </p>
+                  <p className="text-gray-500 text-xs mb-2">
+                    {t("org.inviteLinkHint")}
+                  </p>
+                  <button
+                    onClick={handleCopyInviteLink}
+                    className="text-sm bg-emerald-600 text-white px-3 py-1 rounded hover:bg-emerald-700 transition"
+                  >
+                    {linkCopied ? t("org.linkCopied") : t("org.copyInviteLink")}
+                  </button>
+                </div>
+              )}
 
               {members.length === 0 ? (
                 <p className="text-gray-500 text-sm">{t("org.noMembers")}</p>

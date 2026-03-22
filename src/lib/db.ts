@@ -347,6 +347,15 @@ export async function createInvitation(invitation: OrgInvitation): Promise<OrgIn
   return invitation;
 }
 
+export async function getPendingInvitationCount(email: string): Promise<number> {
+  await ready();
+  const { rows } = await pool.query(
+    "SELECT COUNT(*)::int AS count FROM org_invitations WHERE email = $1 AND status = 'pending'",
+    [email]
+  );
+  return rows[0]?.count ?? 0;
+}
+
 export async function getPendingInvitations(email: string): Promise<OrgInvitation[]> {
   await ready();
   const { rows } = await pool.query(
@@ -504,6 +513,53 @@ export async function recordAiUsage(userId: string): Promise<void> {
     "INSERT INTO ai_usage (id, user_id, used_at) VALUES ($1, $2, $3)",
     [id, userId, new Date().toISOString()]
   );
+}
+
+// Login events
+export async function recordLoginEvent(userId: string): Promise<void> {
+  await ready();
+  const id = crypto.randomUUID();
+  await pool.query(
+    "INSERT INTO login_events (id, user_id, logged_in_at) VALUES ($1, $2, $3)",
+    [id, userId, new Date().toISOString()]
+  );
+}
+
+export async function getAdminUserStats(): Promise<Array<{
+  id: string;
+  email: string | null;
+  name: string;
+  isGuest: boolean;
+  createdAt: string;
+  lastLogin: string | null;
+  programCount: number;
+  sharedProgramCount: number;
+  loginCountLast7Days: number;
+}>> {
+  await ready();
+  const cutoff7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const { rows } = await pool.query(`
+    SELECT
+      u.id, u.email, u.name, u.is_guest, u.created_at,
+      (SELECT MAX(logged_in_at) FROM login_events le WHERE le.user_id = u.id) as last_login,
+      (SELECT COUNT(*)::int FROM programs p WHERE p.user_id = u.id) as program_count,
+      (SELECT COUNT(*)::int FROM programs p WHERE p.user_id = u.id AND p.shared_with_org IS NOT NULL) as shared_program_count,
+      (SELECT COUNT(*)::int FROM login_events le WHERE le.user_id = u.id AND le.logged_in_at > $1) as login_count_7d
+    FROM users u
+    ORDER BY u.created_at DESC
+  `, [cutoff7d]);
+
+  return rows.map(row => ({
+    id: row.id as string,
+    email: row.email as string | null,
+    name: row.name as string,
+    isGuest: row.is_guest as boolean,
+    createdAt: row.created_at as string,
+    lastLogin: row.last_login as string | null,
+    programCount: row.program_count as number,
+    sharedProgramCount: row.shared_program_count as number,
+    loginCountLast7Days: row.login_count_7d as number,
+  }));
 }
 
 // Row mappers

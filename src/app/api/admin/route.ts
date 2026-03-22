@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
-import { getUserByEmail, createUser, updateUser, getAllUsers, setUserPassword } from "@/lib/db";
+import { getUserByEmail, createUser, updateUser, setUserPassword, getAdminUserStats } from "@/lib/db";
 
 function isAdmin(request: NextRequest): boolean {
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const users = await getAllUsers();
+  const users = await getAdminUserStats();
   return NextResponse.json({ users });
 }
 

@@ -7,8 +7,11 @@ interface UserEntry {
   email: string | null;
   name: string;
   isGuest: boolean;
-  locale: string;
   createdAt: string;
+  lastLogin: string | null;
+  programCount: number;
+  sharedProgramCount: number;
+  loginCountLast7Days: number;
 }
 
 export default function AdminPage() {
@@ -193,6 +196,10 @@ export default function AdminPage() {
                   <th className="pb-2 font-medium text-gray-600">Email</th>
                   <th className="pb-2 font-medium text-gray-600">Name</th>
                   <th className="pb-2 font-medium text-gray-600">Type</th>
+                  <th className="pb-2 font-medium text-gray-600">Programs</th>
+                  <th className="pb-2 font-medium text-gray-600">Shared</th>
+                  <th className="pb-2 font-medium text-gray-600">Last Login</th>
+                  <th className="pb-2 font-medium text-gray-600">Logins (7d)</th>
                   <th className="pb-2 font-medium text-gray-600">Created</th>
                 </tr>
               </thead>
@@ -208,6 +215,12 @@ export default function AdminPage() {
                         {u.isGuest ? "Guest" : "User"}
                       </span>
                     </td>
+                    <td className="py-2 text-gray-800 text-center">{u.programCount}</td>
+                    <td className="py-2 text-gray-800 text-center">{u.sharedProgramCount}</td>
+                    <td className="py-2 text-gray-500">
+                      {u.lastLogin ? new Date(u.lastLogin).toLocaleDateString() : "Never"}
+                    </td>
+                    <td className="py-2 text-gray-800 text-center">{u.loginCountLast7Days}</td>
                     <td className="py-2 text-gray-500">
                       {new Date(u.createdAt).toLocaleDateString()}
                     </td>

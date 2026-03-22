@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser, getSessionCookieName } from "@/lib/auth";
-import { createUser, getUser } from "@/lib/db";
+import { createUser, getUser, getPendingInvitationCount } from "@/lib/db";
 import { getRemainingCredits } from "@/lib/openai";
 import { cookies } from "next/headers";
 
@@ -21,12 +21,13 @@ export async function GET() {
       });
       const hasPublicKey = !!process.env.OPENAI_API_KEY;
       const credits = hasPublicKey ? await getRemainingCredits(restored.id) : 0;
-      return NextResponse.json({ user: restored, publicCreditsRemaining: hasPublicKey ? credits : null });
+      return NextResponse.json({ user: restored, publicCreditsRemaining: hasPublicKey ? credits : null, pendingInvitations: 0 });
     }
     return NextResponse.json({ user: null }, { status: 401 });
   }
 
   const hasPublicKey = !!process.env.OPENAI_API_KEY;
   const credits = hasPublicKey && !user.openaiApiKey ? await getRemainingCredits(user.id) : null;
-  return NextResponse.json({ user, publicCreditsRemaining: credits });
+  const pendingInvitations = user.email ? await getPendingInvitationCount(user.email) : 0;
+  return NextResponse.json({ user, publicCreditsRemaining: credits, pendingInvitations });
 }

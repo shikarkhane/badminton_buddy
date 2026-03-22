@@ -8,7 +8,7 @@ import { useState } from "react";
 
 export default function Navbar() {
   const t = useTranslations();
-  const { user, logout } = useAuth();
+  const { user, logout, pendingInvitations } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -41,9 +41,14 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/org"
-                  className="hover:text-emerald-200 transition"
+                  className="hover:text-emerald-200 transition relative"
                 >
                   {t("nav.organization")}
+                  {pendingInvitations > 0 && (
+                    <span className="absolute -top-2 -right-4 bg-red-500 text-white text-xs font-bold rounded-full h-5 min-w-5 flex items-center justify-center px-1">
+                      {pendingInvitations}
+                    </span>
+                  )}
                 </Link>
                 <Link
                   href="/community"
@@ -137,6 +142,11 @@ export default function Navbar() {
               onClick={() => setMenuOpen(false)}
             >
               {t("nav.organization")}
+              {pendingInvitations > 0 && (
+                <span className="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">
+                  {pendingInvitations}
+                </span>
+              )}
             </Link>
             <Link
               href="/community"
