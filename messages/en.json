@@ -112,7 +112,8 @@
     "selectSession": "Training Session",
     "noSession": "-- No session --",
     "noSessionsYet": "No sessions created yet.",
-    "createSessions": "Create your sessions"
+    "createSessions": "Create your sessions",
+    "createProgram": "Create Program"
   },
   "sessions": {
     "title": "My Sessions",
@@ -133,7 +134,8 @@
     "selectMultipleDays": "Click multiple days to select",
     "viewHistory": "History",
     "hideHistory": "Hide History",
-    "noHistory": "No training logged for this session yet."
+    "noHistory": "No training logged for this session yet.",
+    "programHint": "You can assign a program to a session when logging a training entry."
   },
   "actAs": {
     "label": "Acting as",

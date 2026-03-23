@@ -2,6 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { TrainingLogEntry, TrainingProgram, TrainingSession } from "@/lib/types";
 import {
   getTrainingLog,
@@ -20,6 +22,8 @@ const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export default function Timeline() {
   const t = useTranslations();
   const { actingAs } = useAuth();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [log, setLog] = useState<TrainingLogEntry[]>([]);
   const [programs, setPrograms] = useState<TrainingProgram[]>([]);
   const [sessions, setSessions] = useState<TrainingSession[]>([]);
@@ -32,7 +36,6 @@ export default function Timeline() {
 
   // Form state
   const [selectedProgram, setSelectedProgram] = useState("");
-  const [selectedLevel, setSelectedLevel] = useState(1);
   const [selectedSession, setSelectedSession] = useState("");
   const [sessionDate, setSessionDate] = useState(
     new Date().toISOString().split("T")[0]
@@ -65,6 +68,20 @@ export default function Timeline() {
     loadData();
   }, [loadData]);
 
+  // Handle returning from program creation with ?programId=
+  useEffect(() => {
+    const programIdParam = searchParams.get("programId");
+    if (programIdParam && programs.length > 0) {
+      const found = programs.find((p) => p.id === programIdParam);
+      if (found) {
+        setSelectedProgram(found.id);
+        setShowForm(true);
+        // Clear the URL param
+        router.replace("/timeline", { scroll: false });
+      }
+    }
+  }, [searchParams, programs, router]);
+
   const handleLogSession = async () => {
     const program = programs.find((p) => p.id === selectedProgram);
     if (!program) return;
@@ -73,7 +90,7 @@ export default function Timeline() {
       programId: program.id,
       programTitle: program.title,
       theme: program.theme,
-      levelUsed: selectedLevel,
+      levelUsed: 0,
       notes: sessionNotes,
       date: sessionDate,
       sessionId: selectedSession || undefined,
@@ -93,8 +110,6 @@ export default function Timeline() {
       // ignore
     }
   };
-
-  const selectedProg = programs.find((p) => p.id === selectedProgram);
 
   if (loading)
     return <p className="p-8 text-gray-500">{t("common.loading")}</p>;
@@ -164,7 +179,6 @@ export default function Timeline() {
                       const sess = sessions.find((s) => s.id === sessId);
                       if (sess?.programId) {
                         setSelectedProgram(sess.programId);
-                        setSelectedLevel(1);
                       }
                     }
                   }}
@@ -194,41 +208,27 @@ export default function Timeline() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t("timeline.selectProgram")}
               </label>
-              <select
-                value={selectedProgram}
-                onChange={(e) => {
-                  setSelectedProgram(e.target.value);
-                  setSelectedLevel(1);
-                }}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3"
-              >
-                <option value="">-- Select --</option>
-                {programs.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {selectedProg && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t("timeline.selectLevel")}
-                </label>
+              <div className="flex gap-2 items-center">
                 <select
-                  value={selectedLevel}
-                  onChange={(e) => setSelectedLevel(Number(e.target.value))}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                  value={selectedProgram}
+                  onChange={(e) => setSelectedProgram(e.target.value)}
+                  className="flex-1 border border-gray-300 rounded-lg px-4 py-3"
                 >
-                  {selectedProg.levels.map((l) => (
-                    <option key={l.level} value={l.level}>
-                      Level {l.level}: {l.title}
+                  <option value="">-- Select --</option>
+                  {programs.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.title}
                     </option>
                   ))}
                 </select>
+                <Link
+                  href="/create?returnTo=timeline"
+                  className="text-emerald-600 hover:text-emerald-800 text-sm font-medium whitespace-nowrap px-3 py-3 border border-emerald-200 rounded-lg hover:bg-emerald-50 transition"
+                >
+                  + {t("timeline.createProgram")}
+                </Link>
               </div>
-            )}
+            </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -300,7 +300,7 @@ export default function Timeline() {
                         )}
                       </div>
                       <p className="text-sm text-gray-500">
-                        {entry.theme} &middot; Level {entry.levelUsed}
+                        {entry.theme}
                         {entry.creatorName && (
                           <> &middot; {t("common.createdBy", { name: entry.creatorName })}</>
                         )}

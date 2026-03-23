@@ -112,7 +112,8 @@
     "selectSession": "训练时段",
     "noSession": "-- 无时段 --",
     "noSessionsYet": "还没有创建训练时段。",
-    "createSessions": "创建训练时段"
+    "createSessions": "创建训练时段",
+    "createProgram": "创建课程"
   },
   "sessions": {
     "title": "我的训练时段",
@@ -133,7 +134,8 @@
     "selectMultipleDays": "点击多个日期进行选择",
     "viewHistory": "历史",
     "hideHistory": "隐藏历史",
-    "noHistory": "此时段还没有训练记录。"
+    "noHistory": "此时段还没有训练记录。",
+    "programHint": "您可以在记录训练日志时为时段分配课程。"
   },
   "actAs": {
     "label": "身份切换",

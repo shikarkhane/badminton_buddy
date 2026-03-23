@@ -112,7 +112,8 @@
     "selectSession": "Sesión de Entrenamiento",
     "noSession": "-- Sin sesión --",
     "noSessionsYet": "Aún no hay sesiones creadas.",
-    "createSessions": "Crea tus sesiones"
+    "createSessions": "Crea tus sesiones",
+    "createProgram": "Crear Programa"
   },
   "sessions": {
     "title": "Mis Sesiones",
@@ -133,7 +134,8 @@
     "selectMultipleDays": "Haz clic en varios días para seleccionar",
     "viewHistory": "Historial",
     "hideHistory": "Ocultar Historial",
-    "noHistory": "Aún no hay entrenamientos registrados para esta sesión."
+    "noHistory": "Aún no hay entrenamientos registrados para esta sesión.",
+    "programHint": "Puedes asignar un programa a una sesión al registrar una entrada de entrenamiento."
   },
   "actAs": {
     "label": "Actuando como",

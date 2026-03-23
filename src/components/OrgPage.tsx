@@ -436,7 +436,6 @@ export default function OrgPage() {
           {activeTab === "sessions" && selectedOrg && (
             <SessionManager
               orgId={selectedOrg.id}
-              programs={sharedPrograms}
             />
           )}
 

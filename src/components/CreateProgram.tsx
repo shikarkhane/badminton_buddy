@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 import {
   generateProgram,
@@ -29,7 +29,17 @@ const defaultLevel = (num: number): TrainingLevel => ({
 export default function CreateProgram() {
   const t = useTranslations();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo");
   const { user, publicCreditsRemaining, refreshUser } = useAuth();
+
+  const navigateAfterSave = (programId?: string) => {
+    if (returnTo === "timeline" && programId) {
+      router.push(`/timeline?programId=${programId}`);
+    } else {
+      router.push("/programs");
+    }
+  };
   const [tab, setTab] = useState<"ai" | "text" | "custom">("text");
 
   // AI form state
@@ -62,7 +72,7 @@ export default function CreateProgram() {
         intensity,
         levelCount,
       });
-      await saveProgram({
+      const { program: saved } = await saveProgram({
         title: generated.title,
         theme,
         intensity: intensity as "low" | "medium" | "high" | "extreme",
@@ -71,7 +81,7 @@ export default function CreateProgram() {
         isAIGenerated: true,
       });
       refreshUser(); // update credits count
-      router.push("/programs");
+      navigateAfterSave(saved.id);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Generation failed");
     } finally {
@@ -82,7 +92,7 @@ export default function CreateProgram() {
   const handleSaveCustom = async () => {
     setError("");
     try {
-      await saveProgram({
+      const { program: saved } = await saveProgram({
         title: customTitle,
         theme: customTheme,
         intensity: customIntensity as "low" | "medium" | "high" | "extreme",
@@ -90,7 +100,7 @@ export default function CreateProgram() {
         isCustom: true,
         isAIGenerated: false,
       });
-      router.push("/programs");
+      navigateAfterSave(saved.id);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Save failed");
     }
@@ -101,7 +111,7 @@ export default function CreateProgram() {
     setError("");
     try {
       const { program: parsed } = await parseCustomProgram(freeText);
-      await saveProgram({
+      const { program: saved } = await saveProgram({
         title: parsed.title,
         theme: parsed.theme,
         intensity: (parsed.intensity as "low" | "medium" | "high" | "extreme") || "medium",
@@ -110,7 +120,7 @@ export default function CreateProgram() {
         isAIGenerated: false,
       });
       refreshUser(); // update credits count
-      router.push("/programs");
+      navigateAfterSave(saved.id);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Conversion failed");
     } finally {

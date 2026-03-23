@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
-import { TrainingSession, TrainingProgram, TrainingLogEntry, RecurrenceRule } from "@/lib/types";
+import { TrainingSession, TrainingLogEntry, RecurrenceRule } from "@/lib/types";
 import {
   getUserSessions,
   createUserSession,
@@ -17,10 +17,9 @@ const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 interface Props {
   orgId?: string;
-  programs: TrainingProgram[];
 }
 
-export default function SessionManager({ orgId, programs }: Props) {
+export default function SessionManager({ orgId }: Props) {
   const t = useTranslations();
   const [sessions, setSessions] = useState<TrainingSession[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,7 +30,6 @@ export default function SessionManager({ orgId, programs }: Props) {
   const [name, setName] = useState("");
   const [dayOfWeek, setDayOfWeek] = useState(1);
   const [startTime, setStartTime] = useState("18:00");
-  const [programId, setProgramId] = useState<string | null>(null);
   const [recurrenceType, setRecurrenceType] = useState<"weekly" | "biweekly" | "custom">("weekly");
   const [selectedDays, setSelectedDays] = useState<number[]>([1]);
 
@@ -62,7 +60,6 @@ export default function SessionManager({ orgId, programs }: Props) {
     setName("");
     setDayOfWeek(1);
     setStartTime("18:00");
-    setProgramId(null);
     setRecurrenceType("weekly");
     setSelectedDays([1]);
     setShowForm(false);
@@ -90,7 +87,6 @@ export default function SessionManager({ orgId, programs }: Props) {
           name: name.trim(),
           dayOfWeek: primaryDay,
           startTime,
-          programId,
           recurrenceRule: rule,
         });
       } else if (orgId) {
@@ -98,7 +94,6 @@ export default function SessionManager({ orgId, programs }: Props) {
           name: name.trim(),
           dayOfWeek: primaryDay,
           startTime,
-          programId,
           recurrenceRule: rule,
         });
       } else {
@@ -106,7 +101,6 @@ export default function SessionManager({ orgId, programs }: Props) {
           name: name.trim(),
           dayOfWeek: primaryDay,
           startTime,
-          programId,
           recurrenceRule: rule,
         });
       }
@@ -122,7 +116,6 @@ export default function SessionManager({ orgId, programs }: Props) {
     setName(session.name);
     setDayOfWeek(session.dayOfWeek);
     setStartTime(session.startTime);
-    setProgramId(session.programId);
     if (session.recurrenceRule) {
       setRecurrenceType(session.recurrenceRule.type);
       setSelectedDays(session.recurrenceRule.daysOfWeek);
@@ -189,7 +182,7 @@ export default function SessionManager({ orgId, programs }: Props) {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-2">
         <h3 className="font-semibold text-gray-800">{t("sessions.title")}</h3>
         <button
           onClick={() => { resetForm(); setShowForm(!showForm); }}
@@ -198,6 +191,7 @@ export default function SessionManager({ orgId, programs }: Props) {
           + {t("sessions.addSession")}
         </button>
       </div>
+      <p className="text-xs text-gray-400 mb-4">{t("sessions.programHint")}</p>
 
       {/* Add / Edit form */}
       {showForm && (
@@ -264,29 +258,14 @@ export default function SessionManager({ orgId, programs }: Props) {
             )}
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">{t("sessions.startTime")}</label>
-              <input
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">{t("sessions.assignProgram")}</label>
-              <select
-                value={programId || ""}
-                onChange={(e) => setProgramId(e.target.value || null)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-              >
-                <option value="">{t("sessions.noProgram")}</option>
-                {programs.map((p) => (
-                  <option key={p.id} value={p.id}>{p.title}</option>
-                ))}
-              </select>
-            </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">{t("sessions.startTime")}</label>
+            <input
+              type="time"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm sm:max-w-xs"
+            />
           </div>
           <div className="flex gap-2">
             <button
@@ -335,14 +314,6 @@ export default function SessionManager({ orgId, programs }: Props) {
                               </span>
                             )}
                           </div>
-                          {session.programTitle && (
-                            <p className="text-sm text-emerald-600 mt-0.5">
-                              {session.programTitle}
-                            </p>
-                          )}
-                          {!session.programId && (
-                            <p className="text-xs text-gray-400 mt-0.5 italic">{t("sessions.noProgramAssigned")}</p>
-                          )}
                           {session.creatorName && (
                             <p className="text-xs text-gray-400 mt-0.5">{t("common.createdBy", { name: session.creatorName })}</p>
                           )}
