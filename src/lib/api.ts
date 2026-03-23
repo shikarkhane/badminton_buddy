@@ -149,6 +149,13 @@ export async function logTrainingSession(data: {
   });
 }
 
+export async function deleteTrainingLogEntry(id: string): Promise<void> {
+  await fetchJson("/api/training-log", {
+    method: "DELETE",
+    body: JSON.stringify({ id }),
+  });
+}
+
 // Organizations
 export async function getOrgs(): Promise<{ orgs: Organization[] }> {
   return fetchJson("/api/orgs");
