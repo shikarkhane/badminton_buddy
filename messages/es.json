@@ -15,7 +15,8 @@
     "close": "Cerrar",
     "generate": "Generar",
     "useToday": "Usar Hoy",
-    "viewDetails": "Ver Detalles"
+    "viewDetails": "Ver Detalles",
+    "createdBy": "por {name}"
   },
   "nav": {
     "home": "Inicio",

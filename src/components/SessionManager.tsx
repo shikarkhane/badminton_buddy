@@ -343,6 +343,9 @@ export default function SessionManager({ orgId, programs }: Props) {
                           {!session.programId && (
                             <p className="text-xs text-gray-400 mt-0.5 italic">{t("sessions.noProgramAssigned")}</p>
                           )}
+                          {session.creatorName && (
+                            <p className="text-xs text-gray-400 mt-0.5">{t("common.createdBy", { name: session.creatorName })}</p>
+                          )}
                         </div>
                         <div className="flex gap-2 flex-shrink-0">
                           <button

@@ -50,6 +50,7 @@ export interface TrainingLogEntry {
   date: string;
   sessionId?: string | null;
   sessionName?: string | null;
+  creatorName?: string;
   createdAt: string;
 }
 
@@ -70,6 +71,7 @@ export interface TrainingSession {
   programId: string | null;
   programTitle?: string | null;
   recurrenceRule?: RecurrenceRule | null;
+  creatorName?: string;
   createdAt: string;
 }
 

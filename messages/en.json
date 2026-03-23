@@ -15,7 +15,8 @@
     "close": "Close",
     "generate": "Generate",
     "useToday": "Use Today",
-    "viewDetails": "View Details"
+    "viewDetails": "View Details",
+    "createdBy": "by {name}"
   },
   "nav": {
     "home": "Home",

@@ -301,6 +301,9 @@ export default function Timeline() {
                       </div>
                       <p className="text-sm text-gray-500">
                         {entry.theme} &middot; Level {entry.levelUsed}
+                        {entry.creatorName && (
+                          <> &middot; {t("common.createdBy", { name: entry.creatorName })}</>
+                        )}
                       </p>
                       {entry.notes && (
                         <p className="text-gray-600 mt-2 text-sm">

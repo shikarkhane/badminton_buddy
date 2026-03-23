@@ -15,7 +15,8 @@
     "close": "关闭",
     "generate": "生成",
     "useToday": "今日使用",
-    "viewDetails": "查看详情"
+    "viewDetails": "查看详情",
+    "createdBy": "由 {name} 创建"
   },
   "nav": {
     "home": "首页",

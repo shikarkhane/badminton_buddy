@@ -120,7 +120,9 @@ export async function getUserPrograms(
 ): Promise<TrainingProgram[]> {
   await ready();
   const { rows } = await pool.query(
-    "SELECT * FROM programs WHERE user_id = $1 ORDER BY created_at DESC",
+    `SELECT p.*, u.name as creator_name FROM programs p
+     LEFT JOIN users u ON u.id = p.user_id
+     WHERE p.user_id = $1 ORDER BY p.created_at DESC`,
     [userId]
   );
   return rows.map(rowToProgram);
@@ -204,8 +206,9 @@ export async function getUserTrainingLog(
 ): Promise<TrainingLogEntry[]> {
   await ready();
   const { rows } = await pool.query(
-    `SELECT tl.*, ts.name as session_name FROM training_log tl
+    `SELECT tl.*, ts.name as session_name, u.name as creator_name FROM training_log tl
      LEFT JOIN training_sessions ts ON ts.id = tl.session_id
+     LEFT JOIN users u ON u.id = tl.user_id
      WHERE tl.user_id = $1 ORDER BY tl.date DESC`,
     [userId]
   );
@@ -411,7 +414,7 @@ export async function deleteInvitation(id: string): Promise<boolean> {
 export async function getOrgSharedPrograms(orgId: string): Promise<TrainingProgram[]> {
   await ready();
   const { rows } = await pool.query(
-    `SELECT p.*, u.name as author_name FROM programs p
+    `SELECT p.*, u.name as author_name, u.name as creator_name FROM programs p
      JOIN users u ON u.id = p.user_id
      WHERE p.shared_with_org = $1 ORDER BY p.created_at DESC`,
     [orgId]
@@ -449,8 +452,9 @@ export async function createSession(session: TrainingSession): Promise<TrainingS
 export async function getOrgSessions(orgId: string): Promise<TrainingSession[]> {
   await ready();
   const { rows } = await pool.query(
-    `SELECT s.*, p.title as program_title FROM training_sessions s
+    `SELECT s.*, p.title as program_title, u.name as creator_name FROM training_sessions s
      LEFT JOIN programs p ON p.id = s.program_id
+     LEFT JOIN users u ON u.id = s.user_id
      WHERE s.org_id = $1 ORDER BY s.day_of_week, s.start_time`,
     [orgId]
   );
@@ -460,8 +464,9 @@ export async function getOrgSessions(orgId: string): Promise<TrainingSession[]> 
 export async function getUserSessions(userId: string): Promise<TrainingSession[]> {
   await ready();
   const { rows } = await pool.query(
-    `SELECT s.*, p.title as program_title FROM training_sessions s
+    `SELECT s.*, p.title as program_title, u.name as creator_name FROM training_sessions s
      LEFT JOIN programs p ON p.id = s.program_id
+     LEFT JOIN users u ON u.id = s.user_id
      WHERE s.user_id = $1 AND s.org_id IS NULL ORDER BY s.day_of_week, s.start_time`,
     [userId]
   );
@@ -510,8 +515,9 @@ export async function getSession(id: string): Promise<TrainingSession | undefine
 export async function getSessionLogHistory(sessionId: string): Promise<TrainingLogEntry[]> {
   await ready();
   const { rows } = await pool.query(
-    `SELECT tl.*, ts.name as session_name FROM training_log tl
+    `SELECT tl.*, ts.name as session_name, u.name as creator_name FROM training_log tl
      LEFT JOIN training_sessions ts ON ts.id = tl.session_id
+     LEFT JOIN users u ON u.id = tl.user_id
      WHERE tl.session_id = $1 ORDER BY tl.date DESC`,
     [sessionId]
   );
@@ -703,7 +709,7 @@ function rowToProgram(row: Record<string, unknown>): TrainingProgram {
     isCustom: row.is_custom as boolean,
     isAIGenerated: row.is_ai_generated as boolean,
     sharedWithOrg: (row.shared_with_org as string | null) || null,
-    authorName: row.author_name as string | undefined,
+    authorName: (row.author_name as string | undefined) || (row.creator_name as string | undefined),
     orgName: row.org_name as string | undefined,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
@@ -722,6 +728,7 @@ function rowToLogEntry(row: Record<string, unknown>): TrainingLogEntry {
     date: row.date as string,
     sessionId: (row.session_id as string | null) || null,
     sessionName: (row.session_name as string | null) || null,
+    creatorName: row.creator_name as string | undefined,
     createdAt: row.created_at as string,
   };
 }
@@ -743,6 +750,7 @@ function rowToSession(row: Record<string, unknown>): TrainingSession {
     programId: (row.program_id as string | null) || null,
     programTitle: (row.program_title as string | null) || null,
     recurrenceRule,
+    creatorName: row.creator_name as string | undefined,
     createdAt: row.created_at as string,
   };
 }

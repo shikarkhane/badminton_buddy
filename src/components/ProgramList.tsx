@@ -148,6 +148,9 @@ export default function ProgramList() {
                         <span>
                           {new Date(program.createdAt).toLocaleDateString()}
                         </span>
+                        {program.authorName && (
+                          <span>{t("common.createdBy", { name: program.authorName })}</span>
+                        )}
                       </div>
                     </div>
                     <div className="flex gap-3 sm:gap-2 sm:ml-4 sm:flex-shrink-0">
