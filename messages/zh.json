@@ -108,8 +108,10 @@
     "suggestion": "下一个建议主题",
     "suggestionDesc": "根据您最近3次训练，我们建议：",
     "noSuggestion": "完成至少3次训练以获取AI建议。",
-    "selectSession": "训练时段（可选）",
-    "noSession": "-- 无时段 --"
+    "selectSession": "训练时段",
+    "noSession": "-- 无时段 --",
+    "noSessionsYet": "还没有创建训练时段。",
+    "createSessions": "创建训练时段"
   },
   "sessions": {
     "title": "我的训练时段",

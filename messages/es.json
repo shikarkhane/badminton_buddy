@@ -108,8 +108,10 @@
     "suggestion": "Siguiente Tema Sugerido",
     "suggestionDesc": "Basado en tus últimas 3 sesiones, recomendamos:",
     "noSuggestion": "Completa al menos 3 sesiones para obtener sugerencias de IA.",
-    "selectSession": "Sesión de Entrenamiento (opcional)",
-    "noSession": "-- Sin sesión --"
+    "selectSession": "Sesión de Entrenamiento",
+    "noSession": "-- Sin sesión --",
+    "noSessionsYet": "Aún no hay sesiones creadas.",
+    "createSessions": "Crea tus sesiones"
   },
   "sessions": {
     "title": "Mis Sesiones",

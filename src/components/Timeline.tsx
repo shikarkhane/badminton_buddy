@@ -13,7 +13,6 @@ import {
   getOrgSessions,
 } from "@/lib/api";
 import { useAuth } from "./AuthProvider";
-import SessionManager from "./SessionManager";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -25,7 +24,6 @@ export default function Timeline() {
   const [sessions, setSessions] = useState<TrainingSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [showSessions, setShowSessions] = useState(false);
   const [suggestion, setSuggestion] = useState<{
     suggestion: string | null;
     reasoning?: string;
@@ -87,7 +85,6 @@ export default function Timeline() {
   };
 
   const selectedProg = programs.find((p) => p.id === selectedProgram);
-  const orgId = actingAs.type === "org" ? actingAs.orgId : undefined;
 
   if (loading)
     return <p className="p-8 text-gray-500">{t("common.loading")}</p>;
@@ -142,11 +139,11 @@ export default function Timeline() {
             {t("timeline.logSession")}
           </h3>
           <div className="space-y-4">
-            {sessions.length > 0 && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t("timeline.selectSession")}
-                </label>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t("timeline.selectSession")}
+              </label>
+              {sessions.length > 0 ? (
                 <select
                   value={selectedSession}
                   onChange={(e) => {
@@ -175,8 +172,13 @@ export default function Timeline() {
                     );
                   })}
                 </select>
-              </div>
-            )}
+              ) : (
+                <p className="text-sm text-gray-400 py-2">
+                  {t("timeline.noSessionsYet")}{" "}
+                  <a href="/sessions" className="text-emerald-600 hover:underline">{t("timeline.createSessions")}</a>
+                </p>
+              )}
+            </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -261,22 +263,6 @@ export default function Timeline() {
           </div>
         </div>
       )}
-
-      {/* My Sessions */}
-      <div className="mb-6">
-        <button
-          onClick={() => setShowSessions(!showSessions)}
-          className="flex items-center gap-2 text-emerald-700 font-semibold hover:text-emerald-900 transition mb-3"
-        >
-          <span className="text-sm">{showSessions ? "▼" : "▶"}</span>
-          {t("sessions.title")}
-        </button>
-        {showSessions && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
-            <SessionManager orgId={orgId} programs={programs} />
-          </div>
-        )}
-      </div>
 
       {/* Timeline */}
       {log.length === 0 ? (

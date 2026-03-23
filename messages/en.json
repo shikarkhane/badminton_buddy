@@ -108,8 +108,10 @@
     "suggestion": "Suggested Next Theme",
     "suggestionDesc": "Based on your last 3 sessions, we recommend:",
     "noSuggestion": "Complete at least 3 sessions to get AI suggestions.",
-    "selectSession": "Training Session (optional)",
-    "noSession": "-- No session --"
+    "selectSession": "Training Session",
+    "noSession": "-- No session --",
+    "noSessionsYet": "No sessions created yet.",
+    "createSessions": "Create your sessions"
   },
   "sessions": {
     "title": "My Sessions",
