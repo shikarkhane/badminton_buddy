@@ -31,7 +31,7 @@ export default function CreateProgram() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const returnTo = searchParams.get("returnTo");
-  const { user, publicCreditsRemaining, refreshUser } = useAuth();
+  const { user, publicCreditsRemaining, refreshUser, actingAs } = useAuth();
 
   const navigateAfterSave = (programId?: string) => {
     if (returnTo === "timeline" && programId) {
@@ -40,6 +40,8 @@ export default function CreateProgram() {
       router.push("/programs");
     }
   };
+
+  const sharedWithOrg = actingAs.type === "org" ? actingAs.orgId : null;
   const [tab, setTab] = useState<"ai" | "text" | "custom">("text");
 
   // AI form state
@@ -79,6 +81,7 @@ export default function CreateProgram() {
         levels: generated.levels,
         isCustom: false,
         isAIGenerated: true,
+        sharedWithOrg,
       });
       refreshUser(); // update credits count
       navigateAfterSave(saved.id);
@@ -99,6 +102,7 @@ export default function CreateProgram() {
         levels: customLevels,
         isCustom: true,
         isAIGenerated: false,
+        sharedWithOrg,
       });
       navigateAfterSave(saved.id);
     } catch (err: unknown) {
@@ -118,6 +122,7 @@ export default function CreateProgram() {
         levels: parsed.levels,
         isCustom: true,
         isAIGenerated: false,
+        sharedWithOrg,
       });
       refreshUser(); // update credits count
       navigateAfterSave(saved.id);
